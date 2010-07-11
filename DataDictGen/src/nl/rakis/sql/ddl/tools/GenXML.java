@@ -23,10 +23,10 @@ public class GenXML
   /**
    * 
    */
-  private static final String OUTPUT_ = "C:/temp/test.xml";
+  private static final String OUTPUT_ = "test.xml";
   private static final String DBNAME_ = "CMS_GP";
   //  private static final String DBNAME_ = "webapps";
-  private static final String SERVER_ = "localhost";
+  private static final String SERVER_ = "10.0.0.14";
   //  private static final String SERVER_ = "dune";
   private static final String USER_   = "sa";
   //private static final String USER_   = "postgres";
@@ -59,7 +59,7 @@ public class GenXML
     try {
       System.err.println("Opening connection");
       Connection db = driver.getDb(url, USER_, PWD_);
-      SchemaLoader loader = new SchemaLoader(driver, db);
+      SchemaLoader loader = driver.getSchemaLoader(db);
 
       Schema schema = loader.load(SCHEMA_);
 

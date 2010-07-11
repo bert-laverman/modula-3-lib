@@ -72,11 +72,31 @@ abstract public class ColumnedConstraint
   }
 
   /**
+   * @return the columnNames
+   */
+  public List<String> getColumnNames() {
+    return columnNames_;
+  }
+
+  /**
+   * @param columnNames the columnNames to set
+   */
+  public void setColumnNames(List<String> columnNames) {
+    this.columns_.clear();
+    columnNames_ = columnNames;
+  }
+
+  /**
    * @param columns the columns to set
    */
   public void setColumns(List<Column> columns)
   {
-    this.columns_ = columns;
+    this.columns_.clear();
+    this.columnNames_.clear();
+  
+    for (Column column: columns) {
+      addColumn(column);
+    }
   }
 
   /**

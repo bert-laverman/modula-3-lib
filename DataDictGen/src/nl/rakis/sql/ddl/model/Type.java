@@ -3,104 +3,124 @@
  */
 package nl.rakis.sql.ddl.model;
 
-import static nl.rakis.sql.ddl.model.TypeClass.CHARACTER;
-import static nl.rakis.sql.ddl.model.TypeClass.LOGICAL;
-import static nl.rakis.sql.ddl.model.TypeClass.NUMERIC;
-import static nl.rakis.sql.ddl.model.TypeClass.TEMPORAL;
+import static javax.xml.bind.annotation.XmlAccessType.NONE;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author bertl
  * 
  */
-public enum Type
+@XmlType(name = "TypeType", factoryClass = ObjectFactory.class, factoryMethod = "createType")
+@XmlAccessorType(NONE)
+public class Type
+  implements Serializable
 {
-  INT("int", NUMERIC),
-  REAL("real", NUMERIC),
-  NUMBER("number", NUMERIC, false, true, true),
-  DECIMAL("decimal", NUMERIC, false, true, true),
-  CHAR("char", CHARACTER, false, true, false),
-  NCHAR("nchar", CHARACTER, true, true, false),
-  VARCHAR("varchar", CHARACTER, false, true, false),
-  NVARCHAR("nvarchar", CHARACTER, true, true, false),
-  CLOB("clob", CHARACTER),
-  NCLOB("nclob", CHARACTER, true, false, false),
-  BINARY("binary", TypeClass.BINARY, false, true, false),
-  VARBINARY("varbinary", TypeClass.BINARY, false, true, false),
-  BLOB("blob", TypeClass.BINARY),
-  DATE("date", TEMPORAL),
-  TIME("time", TEMPORAL),
-  TIMESTAMP("datetime", TEMPORAL),
-  BOOLEAN("boolean", LOGICAL);
 
-  private String    name_;
-  private TypeClass typeClass_;
-  private boolean   nationalized_ = false;
-  private boolean   hasLength_    = false;
-  private boolean   hasScale_     = false;
-
-  Type(String name, TypeClass typeClass)
-  {
-    this.name_ = name;
-    this.typeClass_ = typeClass;
-  }
-
-  Type(String name, TypeClass typeClass, boolean nationalized,
-       boolean hasLength, boolean hasScale)
-  {
-    this.name_ = name;
-    this.typeClass_ = typeClass;
-    this.nationalized_ = nationalized;
-    this.hasLength_ = hasLength;
-    this.hasScale_ = hasScale;
-  }
-
-  /* (non-Javadoc)
-   * @see java.lang.Enum#toString()
+  /**
+   * 
    */
-  @Override
-  public String toString()
-  {
-    return this.getName();
+  private static final long serialVersionUID = 1743148573208352239L;
+
+  @XmlElement(name = "typeClass", required = true)
+  private TypeClass         clazz_;
+
+  @XmlElement(name = "precision", required = false)
+  private Integer           precision_;
+
+  @XmlElement(name = "scale", required = false)
+  private Integer           scale_;
+
+  @XmlElement(name = "length", required = false)
+  private Integer           length_;
+
+  @XmlElement(name = "national", required = true)
+  private boolean           countInChars_;
+
+  /**
+   * 
+   */
+  public Type() {
+    super();
   }
 
   /**
-   * @return the name
+   * @param clazz
    */
-  public String getName()
-  {
-    return name_;
+  public Type(TypeClass clazz) {
+    this.clazz_ = clazz;
+  }
+
+  public void setClazz(TypeClass clazz) {
+    clazz_ = clazz;
+  }
+
+  public TypeClass getClazz() {
+    return clazz_;
   }
 
   /**
-   * @return the typeClass
+   * @return the precision
    */
-  public TypeClass getTypeClass()
-  {
-    return typeClass_;
+  public Integer getPrecision() {
+    return this.precision_;
   }
 
   /**
-   * @return the nationalized
+   * @param precision
+   *          the precision to set
    */
-  public boolean isNationalized()
-  {
-    return nationalized_;
+  public void setPrecision(Integer precision) {
+    this.precision_ = precision;
   }
 
   /**
-   * @return
+   * @return the scale
    */
-  public boolean hasLength()
-  {
-    return hasLength_;
+  public Integer getScale() {
+    return this.scale_;
   }
 
   /**
-   * @return
+   * @param scale
+   *          the scale to set
    */
-  public boolean hasScale()
-  {
-    return hasScale_;
+  public void setScale(Integer scale) {
+    this.scale_ = scale;
+  }
+
+  /**
+   * @return the charLength
+   */
+  public Integer getLength() {
+    return this.length_;
+  }
+
+  /**
+   * @param length
+   *          the length to set
+   */
+  public void setLength(Integer length) {
+    this.length_ = length;
+  }
+
+  /**
+   * @param countInChars
+   *          the countInChars to set
+   */
+  public void setCountInChars(boolean countInChars) {
+    this.countInChars_ = countInChars;
+  }
+
+  /**
+   * @return the countInChars
+   */
+  public boolean isCountInChars() {
+    return countInChars_;
   }
 
 }

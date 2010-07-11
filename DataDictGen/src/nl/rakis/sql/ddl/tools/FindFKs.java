@@ -15,7 +15,7 @@ import nl.rakis.sql.ddl.model.Column;
 import nl.rakis.sql.ddl.model.ForeignKeyConstraint;
 import nl.rakis.sql.ddl.model.Schema;
 import nl.rakis.sql.ddl.model.Table;
-import nl.rakis.sql.ddl.model.Type;
+import nl.rakis.sql.ddl.model.TypeClass;
 import nl.rakis.sql.jtds.JTDSDriver;
 
 /**
@@ -64,7 +64,7 @@ public class FindFKs
     try {
       System.err.println("Opening connection");
       Connection db = driver.getDb(url, USER_, PWD_);
-      SchemaLoader loader = new SchemaLoader(driver, db);
+      SchemaLoader loader = driver.getSchemaLoader(db);
 
       Schema schema = loader.load(SCHEMA_);
 
@@ -75,7 +75,7 @@ public class FindFKs
 
       for (Table table : schema.getTables()) {
         for (Column column : table.getColumns()) {
-          if (column.getType() == Type.INT) {
+          if (column.getType().getClazz() == TypeClass.INT) {
             // Possible FK
             String colName = column.getName();
             if (colName.toLowerCase().startsWith(table.getName().toLowerCase()))

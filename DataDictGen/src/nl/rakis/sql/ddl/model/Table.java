@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author bertl
  * 
  */
-@XmlType(name = "TableType")
+@XmlType(name = "TableType", factoryClass = ObjectFactory.class, factoryMethod = "createTable")
 @XmlAccessorType(NONE)
 public class Table
   extends SchemaObject
@@ -32,26 +32,19 @@ public class Table
    */
   private static final long          serialVersionUID = 1L;
 
-  @XmlElementWrapper(name = "columns", required = true, nillable = true)
-  @XmlElement(name = "column", required = false)
   private List<Column>               columns_         = new ArrayList<Column>();
   private Map<String, Column>        columnMap_       = new HashMap<String, Column>();
 
   private List<Constraint>           constraints_     = new ArrayList<Constraint>();
 
-  @XmlElement(name = "primary-key", required = true, nillable = true)
+  private Map<String, Constraint>    constraintMap_ = new HashMap<String, Constraint>();
+
   private PrimaryKeyConstraint       primaryKey_;
 
-  @XmlElementWrapper(name = "foreign-keys", required = true, nillable = true)
-  @XmlElement(name = "foreign-key")
   private List<ForeignKeyConstraint> foreignKeys_     = new ArrayList<ForeignKeyConstraint>();
 
-  @XmlElementWrapper(name = "unique-keys")
-  @XmlElement(name = "unique-key")
   private List<UniqueConstraint>     uniqueKeys_      = new ArrayList<UniqueConstraint>();
 
-  @XmlElementWrapper(name = "indices", required = true, nillable = true)
-  @XmlElement(name = "index")
   private List<Index>                indices_         = new ArrayList<Index>();
 
   private Map<String, Index>         indexMap_        = new TreeMap<String, Index>();
@@ -89,14 +82,14 @@ public class Table
   {
     this.columns_.clear();
     this.columnMap_.clear();
-    for (Column column : columns) {
-      addColumn(column);
-    }
+    this.columns_.addAll(columns);
   }
 
   /**
    * @return the columns
    */
+  @XmlElementWrapper(name = "columns", required = true, nillable = true)
+  @XmlElement(name = "column", required = false)
   public Collection<Column> getColumns()
   {
     return this.columns_;
@@ -111,6 +104,13 @@ public class Table
 
   public Column getColumn(String name)
   {
+    if (this.columns_.size() != this.columnMap_.size()) {
+      this.columnMap_.clear();
+      for (Column column: this.columns_) {
+        this.columnMap_.put(column.getName(), column);
+      }
+    }
+
     Column result = null;
 
     if (this.columnMap_.containsKey(name.toLowerCase())) {
@@ -124,7 +124,10 @@ public class Table
    */
   public void setConstraints(List<Constraint> constraints)
   {
-    this.constraints_ = constraints;
+    this.constraints_.clear();
+    for (Constraint constraint: constraints) {
+      addConstraint(constraint);
+    }
   }
 
   /**
@@ -132,6 +135,27 @@ public class Table
    */
   public List<Constraint> getConstraints()
   {
+    int n = this.foreignKeys_.size() + this.uniqueKeys_.size();
+    if (this.primaryKey_ != null) {
+      n += 1;
+    }
+    if (n != this.constraints_.size()) {
+      this.constraints_.clear();
+      this.constraintMap_.clear();
+
+      if (this.primaryKey_ != null) {
+        this.constraints_.add(this.primaryKey_);
+        this.constraintMap_.put(this.primaryKey_.getName(), this.primaryKey_);
+      }
+      for (Constraint constraint: this.foreignKeys_) {
+        this.constraints_.add(constraint);
+        this.constraintMap_.put(constraint.getName(), constraint);
+      }
+      for (Constraint constraint: this.uniqueKeys_) {
+        this.constraints_.add(constraint);
+        this.constraintMap_.put(constraint.getName(), constraint);
+      }
+    }
     return constraints_;
   }
 
@@ -140,10 +164,10 @@ public class Table
    */
   public void addConstraint(Constraint constraint)
   {
-    constraint.setSchema(getSchema());
     constraint.setTable(this);
 
     this.constraints_.add(constraint);
+    this.constraintMap_.put(constraint.getName(), constraint);
 
     switch (constraint.getType()) {
     case PRIMARY_KEY:
@@ -165,24 +189,72 @@ public class Table
   }
 
   /**
+   * @param string
+   * @return
+   */
+  public ColumnedConstraint getColumnedConstraint(String string) {
+    ColumnedConstraint result = null;
+  
+    if (this.constraintMap_.containsKey(string)) {
+      result = (ColumnedConstraint) this.constraintMap_.get(string);
+    }
+    return result;
+  }
+
+  /**
+   * @param primaryKey the primaryKey to set
+   */
+  public void setPrimaryKey(PrimaryKeyConstraint primaryKey) {
+    this.primaryKey_ = primaryKey;
+    if (this.primaryKey_ != null) {
+      this.primaryKey_.setTable(this);
+    }
+  }
+
+  /**
    * @return the primaryKey
    */
+  @XmlElement(name = "primary-key", required = true, nillable = true)
   public PrimaryKeyConstraint getPrimaryKey()
   {
     return primaryKey_;
   }
 
   /**
+   * @param foreignKeys the foreignKeys to set
+   */
+  public void setForeignKeys(List<ForeignKeyConstraint> foreignKeys) {
+    this.foreignKeys_ = foreignKeys;
+    for (ForeignKeyConstraint key: this.foreignKeys_) {
+      key.setTable(this);
+    }
+  }
+
+  /**
    * @return the foreignKeys
    */
+  @XmlElementWrapper(name = "foreign-keys", required = true, nillable = true)
+  @XmlElement(name = "foreign-key")
   public List<ForeignKeyConstraint> getForeignKeys()
   {
     return this.foreignKeys_;
   }
 
   /**
+   * @param uniqueKeys the uniqueKeys to set
+   */
+  public void setUniqueKeys(List<UniqueConstraint> uniqueKeys) {
+    this.uniqueKeys_ = uniqueKeys;
+    for (UniqueConstraint constraint: this.uniqueKeys_) {
+      constraint.setTable(this);
+    }
+  }
+
+  /**
    * @return the uniqueKeys
    */
+  @XmlElementWrapper(name = "unique-keys")
+  @XmlElement(name = "unique-key")
   public List<UniqueConstraint> getUniqueKeys()
   {
     return this.uniqueKeys_;
@@ -193,17 +265,17 @@ public class Table
    */
   public void setIndices(List<Index> indices)
   {
-    this.indices_.clear();
-    this.indexMap_.clear();
-
-    for (Index index : indices) {
-      addIndex(index);
+    this.indices_ = indices;
+    for (Index index: this.indices_) {
+      index.setTable(this);
     }
   }
 
   /**
    * @return the indices
    */
+  @XmlElementWrapper(name = "indices", required = true, nillable = true)
+  @XmlElement(name = "index")
   public List<Index> getIndices()
   {
     return indices_;
@@ -216,26 +288,6 @@ public class Table
 
     this.indices_.add(index);
     this.indexMap_.put(index.getName(), index);
-  }
-
-  /**
-   * @param indexMap the indexMap to set
-   */
-  public void setIndexMap(Map<String, Index> indexMap)
-  {
-    this.indices_.clear();
-    this.indexMap_.clear();
-
-    this.indices_.addAll(indexMap.values());
-    this.indexMap_.putAll(indexMap);
-  }
-
-  /**
-   * @return the indexMap
-   */
-  public Map<String, Index> getIndexMap()
-  {
-    return indexMap_;
   }
 
 }

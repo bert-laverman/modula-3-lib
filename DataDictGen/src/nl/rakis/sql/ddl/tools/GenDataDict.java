@@ -3,9 +3,12 @@
  */
 package nl.rakis.sql.ddl.tools;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
+import java.io.Reader;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -29,23 +32,24 @@ public class GenDataDict
   /**
    * 
    */
-  private static final String OUTPUT_ = "C:/temp/test.html";
+  private static final String INPUT   = "test.xml";
+  private static final String OUTPUT_ = "test.html";
   private static final String DBNAME_ = "CMS";
-  //  private static final String DBNAME_ = "webapps";
+  // private static final String DBNAME_ = "webapps";
   private static final String SERVER_ = "localhost";
-  //  private static final String SERVER_ = "dune";
+  // private static final String SERVER_ = "dune";
   private static final String USER_   = "sa";
-  //private static final String USER_   = "postgres";
+  // private static final String USER_ = "postgres";
   private static final String PWD_    = "Krwa2Krwa";
   private static final String SCHEMA_ = "dbo";
 
   private static DbDriver     driver  = new JTDSDriver();
-  //  private static DbDriver          driver  = new PostgreSQLDriver();
+  // private static DbDriver driver = new PostgreSQLDriver();
 
   private static PrintWriter  out     = null;
+  private static Reader       in      = null;
 
-  private static void printTag(String tag, String... args)
-  {
+  private static void printTag(String tag, String... args) {
     out.print('<');
     out.print(tag);
 
@@ -69,8 +73,7 @@ public class GenDataDict
     out.println('>');
   }
 
-  private static void printOpen(String tag, boolean doLn)
-  {
+  private static void printOpen(String tag, boolean doLn) {
     out.print('<');
     out.print(tag);
     out.print('>');
@@ -79,13 +82,11 @@ public class GenDataDict
     }
   }
 
-  private static void printOpen(String tag)
-  {
+  private static void printOpen(String tag) {
     printOpen(tag, false);
   }
 
-  private static void printClose(String tag, boolean doLn)
-  {
+  private static void printClose(String tag, boolean doLn) {
     out.print('<');
     out.print('/');
     out.print(tag);
@@ -95,13 +96,11 @@ public class GenDataDict
     }
   }
 
-  private static void printClose(String tag)
-  {
+  private static void printClose(String tag) {
     printClose(tag, true);
   }
 
-  private static void dumpColumns(Collection<Column> columns)
-  {
+  private static void dumpColumns(Collection<Column> columns) {
     printOpen("table", true);
     printOpen("tr");
     printTag("th", "Name");
@@ -113,7 +112,7 @@ public class GenDataDict
     for (Column column : columns) {
       printOpen("tr", true);
       printTag("td", column.getName());
-      printTag("td", column.getTypeString());
+      printTag("td", driver.buildTypeString(column.getType()));
       printTag("td", column.isNullable() ? "NULL" : "NOT NULL");
       printClose("tr");
     }
@@ -121,8 +120,7 @@ public class GenDataDict
     printClose("table");
   }
 
-  private static String buildDefinition(Constraint cons)
-  {
+  private static String buildDefinition(Constraint cons) {
     StringBuffer buf = new StringBuffer();
 
     if (cons instanceof ColumnedConstraint) {
@@ -131,14 +129,14 @@ public class GenDataDict
       buf.append('(');
       boolean doComma = false;
 
-      for (Column col : ccons.getColumns()) {
+      for (String columnName : ccons.getColumnNames()) {
         if (doComma) {
           buf.append(',');
         }
         else {
           doComma = true;
         }
-        buf.append(col.getName());
+        buf.append(columnName);
       }
       buf.append(')');
 
@@ -148,14 +146,14 @@ public class GenDataDict
         buf.append(" REFERENCES ").append(ref.getTable().getName()).append('(');
         doComma = false;
 
-        for (Column col : ref.getColumns()) {
+        for (String columnName : ref.getColumnNames()) {
           if (doComma) {
             buf.append(',');
           }
           else {
             doComma = true;
           }
-          buf.append(col.getName());
+          buf.append(columnName);
         }
         buf.append(')');
       }
@@ -164,8 +162,7 @@ public class GenDataDict
     return buf.toString();
   }
 
-  private static void dumpConstraints(Collection<Constraint> constraints)
-  {
+  private static void dumpConstraints(Collection<Constraint> constraints) {
     printOpen("table border=0", true);
 
     for (Constraint cons : constraints) {
@@ -190,8 +187,7 @@ public class GenDataDict
     printClose("table");
   }
 
-  private static void printTableHeader(String schema, String table)
-  {
+  private static void printTableHeader(String schema, String table) {
     printTag("h3", "Table", table);
     printTag("h4", "Summary");
     printTag("p", "Description of table", table, "goes here.");
@@ -210,12 +206,12 @@ public class GenDataDict
     }
   }
 
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     System.err.println("Starting up");
     try {
       driver.init();
       out = new PrintWriter(OUTPUT_);
+      in = new BufferedReader(new FileReader(INPUT));
     }
     catch (ClassNotFoundException e) {
       System.err.println("Unable to load jTDS Driver");
@@ -226,17 +222,18 @@ public class GenDataDict
       System.exit(2);
     }
 
-    String url = driver.buildUrl(SERVER_, DBNAME_);
-    //"jdbc:jtds:sqlserver://localhost/CMS;instance=SQLEXPRESS";
+//    String url = driver.buildUrl(SERVER_, DBNAME_);
+    // "jdbc:jtds:sqlserver://localhost/CMS;instance=SQLEXPRESS";
     try {
       System.err.println("Opening connection");
-      Connection db = driver.getDb(url, USER_, PWD_);
-      SchemaLoader loader = new SchemaLoader(driver, db);
+//      Connection db = driver.getDb(url, USER_, PWD_);
+      // SchemaLoader loader = driver.getSchemaLoader(db);
+      SchemaLoader loader = driver.getSchemaXmlReader(in);
 
       Schema schema = loader.load(SCHEMA_);
 
-      System.err.println("Closing connection");
-      db.close();
+//      System.err.println("Closing connection");
+//      db.close();
 
       printSchema(schema);
     }
@@ -244,6 +241,15 @@ public class GenDataDict
       e.printStackTrace();
     }
     finally {
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (IOException e) {
+          // IGNORE
+          e.printStackTrace();
+        }
+      }
       out.close();
     }
   }

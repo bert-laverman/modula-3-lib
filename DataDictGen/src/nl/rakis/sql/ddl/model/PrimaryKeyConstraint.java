@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author bertl
  * 
  */
-@XmlType(name = "PrimaryKeyType")
+@XmlType(name = "PrimaryKeyType", factoryClass = ObjectFactory.class, factoryMethod = "createPrimaryKeyConstraint")
 @XmlAccessorType(NONE)
 public class PrimaryKeyConstraint
   extends ColumnedConstraint
@@ -26,6 +26,8 @@ public class PrimaryKeyConstraint
   public PrimaryKeyConstraint()
   {
     super();
+
+    setType(ConstraintType.PRIMARY_KEY);
   }
 
   /**

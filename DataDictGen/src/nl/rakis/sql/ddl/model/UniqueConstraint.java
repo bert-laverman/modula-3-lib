@@ -3,10 +3,17 @@
  */
 package nl.rakis.sql.ddl.model;
 
+import static javax.xml.bind.annotation.XmlAccessType.NONE;
+
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * @author bertl
  * 
  */
+@XmlType(name = "UniqueConstraintType", factoryClass = ObjectFactory.class, factoryMethod = "createUniqueConstraint")
+@XmlAccessorType(NONE)
 public class UniqueConstraint
   extends ColumnedConstraint
 {
@@ -19,6 +26,8 @@ public class UniqueConstraint
   public UniqueConstraint()
   {
     super();
+
+    setType(ConstraintType.UNIQUE);
   }
 
   /**

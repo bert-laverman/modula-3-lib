@@ -12,8 +12,8 @@ import nl.rakis.sql.DbDriver;
 import nl.rakis.sql.ddl.SchemaGenerator;
 import nl.rakis.sql.ddl.SchemaLoader;
 import nl.rakis.sql.ddl.model.Constraint;
-import nl.rakis.sql.ddl.model.ConstraintType;
 import nl.rakis.sql.ddl.model.Schema;
+import nl.rakis.sql.ddl.model.Table;
 import nl.rakis.sql.jtds.JTDSDriver;
 
 /**
@@ -28,21 +28,20 @@ public class DropConstraints
    */
   private static final String OUTPUT_ = "C:/temp/test.sql";
   private static final String DBNAME_ = "CMS_GP";
-  //  private static final String DBNAME_ = "webapps";
+  // private static final String DBNAME_ = "webapps";
   private static final String SERVER_ = "localhost";
-  //  private static final String SERVER_ = "dune";
+  // private static final String SERVER_ = "dune";
   private static final String USER_   = "sa";
-  //private static final String USER_   = "postgres";
+  // private static final String USER_ = "postgres";
   private static final String PWD_    = "Krwa2Krwa";
   private static final String SCHEMA_ = "dbo";
 
   private static DbDriver     driver  = new JTDSDriver();
-  //  private static DbDriver          driver  = new PostgreSQLDriver();
+  // private static DbDriver driver = new PostgreSQLDriver();
 
   private static PrintWriter  out     = null;
 
-  public static void main(String[] args)
-  {
+  public static void main(String[] args) {
     System.err.println("Starting up");
     try {
       driver.init();
@@ -58,11 +57,11 @@ public class DropConstraints
     }
 
     String url = driver.buildUrl(SERVER_, DBNAME_);
-    //"jdbc:jtds:sqlserver://localhost/CMS;instance=SQLEXPRESS";
+    // "jdbc:jtds:sqlserver://localhost/CMS;instance=SQLEXPRESS";
     try {
       System.err.println("Opening connection");
       Connection db = driver.getDb(url, USER_, PWD_);
-      SchemaLoader loader = new SchemaLoader(driver, db);
+      SchemaLoader loader = driver.getSchemaLoader(db);
 
       Schema schema = loader.load(SCHEMA_);
 
@@ -71,11 +70,14 @@ public class DropConstraints
 
       SchemaGenerator gen = driver.getSchemaWriter(out);
 
-      for (Constraint cons: schema.getForeignKeys()) {
-        gen.drop(cons);
-      }
-      for (Constraint cons: schema.getConstraints()) {
-        if (cons.getType() != ConstraintType.FOREIGN_KEY) {
+      for (Table table : schema.getTables()) {
+        if (table.getPrimaryKey() != null) {
+          gen.drop(table.getPrimaryKey());
+        }
+        for (Constraint cons : table.getForeignKeys()) {
+          gen.drop(cons);
+        }
+        for (Constraint cons : table.getUniqueKeys()) {
           gen.drop(cons);
         }
       }

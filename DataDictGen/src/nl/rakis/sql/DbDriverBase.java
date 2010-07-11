@@ -4,12 +4,15 @@
 package nl.rakis.sql;
 
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.Map;
 import java.util.Properties;
 
 import nl.rakis.sql.ddl.SchemaGenerator;
+import nl.rakis.sql.ddl.SchemaLoader;
+import nl.rakis.sql.ddl.SchemaXmlLoader;
 import nl.rakis.sql.ddl.SchemaXmlWriter;
-import nl.rakis.sql.ddl.model.Type;
+import nl.rakis.sql.ddl.model.TypeClass;
 
 /**
  * @author bertl
@@ -65,33 +68,45 @@ public abstract class DbDriverBase
   /**
    * @return
    */
-  public abstract Map<String, Type> getName2TypeMap();
+  public abstract Map<String, TypeClass> getName2TypeMap();
 
   /**
    * @return
    */
-  public abstract Map<Type, String> getType2NameMap();
+  public abstract Map<TypeClass, String> getType2NameMap();
 
   /* (non-Javadoc)
    * @see nl.rakis.sql.DbDriver#string2Type(java.lang.String)
    */
   @Override
-  public Type string2Type(String name)
+  public TypeClass string2Type(String name)
   {
-    Map<String, Type> map = getName2TypeMap();
+    Map<String, TypeClass> map = getName2TypeMap();
 
     return map.containsKey(name) ? map.get(name) : null;
   }
 
   /* (non-Javadoc)
-   * @see nl.rakis.sql.DbDriver#type2String(nl.rakis.sql.ddl.model.Type)
+   * @see nl.rakis.sql.DbDriver#type2String(nl.rakis.sql.ddl.model.TypeClass)
    */
   @Override
-  public String type2String(Type type)
+  public String type2String(TypeClass type)
   {
-    Map<Type, String> map = getType2NameMap();
+    Map<TypeClass, String> map = getType2NameMap();
 
     return map.containsKey(type) ? map.get(type) : null;
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.DbDriver#getSchemaXmlReader(java.io.Reader)
+   */
+  @Override
+  public SchemaLoader getSchemaXmlReader(Reader reader) {
+    SchemaXmlLoader loader = new SchemaXmlLoader();
+    loader.setDriver(this);
+    loader.setReader(reader);
+  
+    return loader;
   }
 
 }

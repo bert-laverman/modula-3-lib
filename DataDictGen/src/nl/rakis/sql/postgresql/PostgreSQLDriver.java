@@ -12,7 +12,9 @@ import java.util.Map;
 import nl.rakis.sql.DbDriver;
 import nl.rakis.sql.DbDriverBase;
 import nl.rakis.sql.ddl.SchemaGenerator;
+import nl.rakis.sql.ddl.SchemaLoader;
 import nl.rakis.sql.ddl.model.Type;
+import nl.rakis.sql.ddl.model.TypeClass;
 
 /**
  * @author bertl
@@ -112,7 +114,7 @@ public class PostgreSQLDriver
    * @see nl.rakis.sql.DbDriverBase#getName2TypeMap()
    */
   @Override
-  public Map<String, Type> getName2TypeMap()
+  public Map<String, TypeClass> getName2TypeMap()
   {
     // TODO Auto-generated method stub
     return null;
@@ -122,8 +124,26 @@ public class PostgreSQLDriver
    * @see nl.rakis.sql.DbDriverBase#getType2NameMap()
    */
   @Override
-  public Map<Type, String> getType2NameMap()
+  public Map<TypeClass, String> getType2NameMap()
   {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.DbDriver#buildTypeString(nl.rakis.sql.ddl.model.Type)
+   */
+  @Override
+  public String buildTypeString(Type type) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.DbDriver#getSchemaLoader(java.sql.Connection)
+   */
+  @Override
+  public SchemaLoader getSchemaLoader(Connection db) {
     // TODO Auto-generated method stub
     return null;
   }

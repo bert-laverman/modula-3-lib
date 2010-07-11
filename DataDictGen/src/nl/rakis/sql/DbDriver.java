@@ -1,12 +1,15 @@
 package nl.rakis.sql;
 
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
 import nl.rakis.sql.ddl.SchemaGenerator;
+import nl.rakis.sql.ddl.SchemaLoader;
 import nl.rakis.sql.ddl.model.Type;
+import nl.rakis.sql.ddl.model.TypeClass;
 
 public interface DbDriver
 {
@@ -93,14 +96,31 @@ public interface DbDriver
   SchemaGenerator getSchemaXmlWriter(PrintWriter writer);
 
   /**
+   * @param db
+   * @return
+   */
+  SchemaLoader getSchemaLoader(Connection db);
+
+  /**
+   * @return
+   */
+  SchemaLoader getSchemaXmlReader(Reader reader);
+
+  /**
    * @param type
    * @return
    */
-  String type2String(Type type);
+  String type2String(TypeClass type);
 
   /**
    * @param name
    * @return
    */
-  Type string2Type(String name);
+  TypeClass string2Type(String name);
+
+  /**
+   * @param type
+   * @return
+   */
+  String buildTypeString(Type type);
 }

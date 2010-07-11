@@ -42,6 +42,7 @@ public class SchemaXmlWriter
                                               ForeignKeyConstraint.class,
                                               UniqueConstraint.class);
       this.marshaller_ = this.context_.createMarshaller();
+      this.marshaller_.setProperty("jaxb.formatted.output", Boolean.TRUE);
     }
   }
 

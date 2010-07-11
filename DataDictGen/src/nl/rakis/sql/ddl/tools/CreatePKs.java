@@ -15,7 +15,7 @@ import nl.rakis.sql.ddl.model.Column;
 import nl.rakis.sql.ddl.model.PrimaryKeyConstraint;
 import nl.rakis.sql.ddl.model.Schema;
 import nl.rakis.sql.ddl.model.Table;
-import nl.rakis.sql.ddl.model.Type;
+import nl.rakis.sql.ddl.model.TypeClass;
 import nl.rakis.sql.jtds.JTDSDriver;
 
 /**
@@ -64,7 +64,7 @@ public class CreatePKs
     try {
       System.err.println("Opening connection");
       Connection db = driver.getDb(url, USER_, PWD_);
-      SchemaLoader loader = new SchemaLoader(driver, db);
+      SchemaLoader loader = driver.getSchemaLoader(db);
 
       Schema schema = loader.load(SCHEMA_);
 
@@ -82,7 +82,7 @@ public class CreatePKs
           id = table.getColumns().iterator().next();
           if ((!id.getName().toLowerCase().endsWith("id") &&
               !id.getName().equalsIgnoreCase(table.getName())) ||
-              id.getType() != Type.INT)
+              id.getType().getClazz() != TypeClass.INT)
           {
             id = null;
           }
