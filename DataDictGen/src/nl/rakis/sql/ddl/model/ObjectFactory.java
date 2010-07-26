@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 
 /**
  * @author bertl
- *
+ * 
  */
 @XmlRegistry
 public class ObjectFactory
@@ -31,6 +31,10 @@ public class ObjectFactory
 
   public static UniqueConstraint createUniqueConstraint() {
     return new UniqueConstraint();
+  }
+
+  public static CheckConstraint createCheckConstraint() {
+    return new CheckConstraint();
   }
 
   public static Index createIndex() {

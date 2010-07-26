@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Set;
 
 import nl.rakis.sql.DbDriver;
 import nl.rakis.sql.DbDriverBase;
@@ -94,7 +95,7 @@ public class PostgreSQLDriver
    * @see nl.rakis.sql.DbDriver#getSchemaCreator()
    */
   @Override
-  public SchemaGenerator getSchemaCreator()
+  public SchemaGenerator getSchemaGenerator(Connection db)
   {
     // TODO Auto-generated method stub
     return null;
@@ -116,6 +117,15 @@ public class PostgreSQLDriver
   @Override
   public Map<String, TypeClass> getName2TypeMap()
   {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.DbDriver#getMaxedVars()
+   */
+  @Override
+  public Set<String> getMaxedVars() {
     // TODO Auto-generated method stub
     return null;
   }

@@ -3,11 +3,10 @@
  */
 package nl.rakis.sql.ddl.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -32,7 +31,7 @@ public class Schema
    */
   private static final long          serialVersionUID = 1L;
 
-  private List<Table>                tables_          = new ArrayList<Table>();
+  private Collection<Table>                tables_          = new TreeSet<Table>();
 
   private Map<String, Table>         tableMap_        = new TreeMap<String, Table>();
 

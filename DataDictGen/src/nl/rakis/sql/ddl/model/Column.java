@@ -31,70 +31,82 @@ public class Column
   @XmlElement(name = "type")
   private Type              type_;
 
-  @XmlElement(name = "nullable", required = true)
+  @XmlElement(name = "nullable", required = true, nillable = false)
   private boolean           nullable_;
+
+  @XmlElement(name = "default-value", required = false, nillable = true)
+  private String            default_;
 
   /**
    * 
    */
-  public Column()
-  {
+  public Column() {
     super();
   }
 
   /**
    * @param name
    */
-  public Column(String name)
-  {
+  public Column(String name) {
     super(name);
   }
 
   /**
    * @return the type
    */
-  public Type getType()
-  {
+  public Type getType() {
     return this.type_;
   }
 
   /**
-   * @param table the table to set
+   * @param table
+   *          the table to set
    */
-  public void setTable(Table table)
-  {
+  public void setTable(Table table) {
     this.table_ = table;
   }
 
   /**
    * @return the table
    */
-  public Table getTable()
-  {
+  public Table getTable() {
     return table_;
   }
 
   /**
-   * @param type the type to set
+   * @param type
+   *          the type to set
    */
-  public void setType(Type type)
-  {
+  public void setType(Type type) {
     this.type_ = type;
   }
 
   /**
    * @return the nullable
    */
-  public boolean isNullable()
-  {
+  public boolean isNullable() {
     return this.nullable_;
   }
 
   /**
-   * @param nullable the nullable to set
+   * @param nullable
+   *          the nullable to set
    */
-  public void setNullable(boolean nullable)
-  {
+  public void setNullable(boolean nullable) {
     this.nullable_ = nullable;
+  }
+
+  /**
+   * @param _default the default to set
+   */
+  public void setDefault(String _default) {
+    default_ = _default;
+  }
+
+  /**
+   * @return the default
+   */
+  public String getDefault() {
+    return default_;
   }
 }

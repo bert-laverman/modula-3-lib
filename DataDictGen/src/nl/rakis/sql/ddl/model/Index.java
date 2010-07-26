@@ -46,16 +46,14 @@ public class Index
   /**
    * 
    */
-  public Index()
-  {
+  public Index() {
     super();
   }
 
   /**
    * @param type
    */
-  public Index(Table table)
-  {
+  public Index(Table table) {
     super();
 
     this.setTable(table);
@@ -65,8 +63,7 @@ public class Index
    * @param name
    * @param type
    */
-  public Index(Table table, String name)
-  {
+  public Index(Table table, String name) {
     super(name);
 
     this.setTable(table);
@@ -77,26 +74,24 @@ public class Index
    * @param schema
    * @param name
    */
-  public Index(Table table, Schema schema, String name)
-  {
+  public Index(Table table, Schema schema, String name) {
     super(schema, name);
 
     this.setTable(table);
   }
 
   /**
-   * @param columns the columns to set
+   * @param columns
+   *          the columns to set
    */
-  public void setColumns(List<Column> columns)
-  {
+  public void setColumns(List<Column> columns) {
     this.columns_ = columns;
   }
 
   /**
    * @return the columns
    */
-  public List<Column> getColumns()
-  {
+  public List<Column> getColumns() {
     if (this.columnNames_.size() > this.columns_.size()) {
       this.columns_.clear();
       for (String columnName : this.columnNames_) {
@@ -106,87 +101,96 @@ public class Index
     return columns_;
   }
 
-  public void addColumn(Column column)
-  {
+  public void addColumn(Column column) {
     this.columns_.add(column);
     this.columnNames_.add(column.getName());
   }
 
-  public void addColumn(String name)
-  {
+  public void addColumn(String name) {
     this.columns_.add(this.getTable().getColumn(name));
     this.columnNames_.add(name);
   }
 
   /**
-   * @param table the table to set
+   * @param table
+   *          the table to set
    */
-  public void setTable(Table table)
-  {
+  public void setTable(Table table) {
     this.table_ = table;
   }
 
   /**
    * @return the table
    */
-  public Table getTable()
-  {
+  public Table getTable() {
     return table_;
   }
 
   /**
-   * @param descending the descending to set
+   * @return the columnNames
    */
-  public void setDescending(boolean descending)
-  {
+  public List<String> getColumnNames() {
+    return columnNames_;
+  }
+
+  /**
+   * @param columnNames
+   *          the columnNames to set
+   */
+  public void setColumnNames(List<String> columnNames) {
+    columnNames_ = columnNames;
+  }
+
+  /**
+   * @param descending
+   *          the descending to set
+   */
+  public void setDescending(boolean descending) {
     this.descending_ = descending;
   }
 
   /**
    * @return the descending
    */
-  public boolean isDescending()
-  {
+  public boolean isDescending() {
     return descending_;
   }
 
   /**
-   * @param unique the unique to set
+   * @param unique
+   *          the unique to set
    */
-  public void setUnique(boolean unique)
-  {
+  public void setUnique(boolean unique) {
     this.unique_ = unique;
   }
 
   /**
    * @return the unique
    */
-  public boolean isUnique()
-  {
+  public boolean isUnique() {
     return unique_;
   }
 
   /**
-   * @param constraintName the constraintName to set
+   * @param constraintName
+   *          the constraintName to set
    */
-  public void setConstraintName(String constraintName)
-  {
+  public void setConstraintName(String constraintName) {
     this.constraintName_ = constraintName;
   }
 
   /**
    * @return the constraintName
    */
-  public String getConstraintName()
-  {
+  public String getConstraintName() {
     return constraintName_;
   }
 
   /**
-   * @param constraint the constraint to set
+   * @param constraint
+   *          the constraint to set
    */
-  public void setConstraint(UniqueConstraint constraint)
-  {
+  public void setConstraint(UniqueConstraint constraint) {
     this.constraint_ = constraint;
     this.constraintName_ = constraint.getName();
   }
@@ -194,8 +198,7 @@ public class Index
   /**
    * @return the constraint
    */
-  public UniqueConstraint getConstraint()
-  {
+  public UniqueConstraint getConstraint() {
     return constraint_;
   }
 

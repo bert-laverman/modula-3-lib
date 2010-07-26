@@ -18,20 +18,31 @@ import nl.rakis.sql.ddl.model.TypeClass;
  * @author bertl
  * 
  */
+/**
+ * @author bertl
+ * 
+ */
 public abstract class DbDriverBase
   implements DbDriver
 {
 
   private Properties props_ = null;
+  private boolean    sqlFormatted_;
 
-  @Override
-  public void setProperties(Properties props)
-  {
-    this.props_ = props;
+  /**
+   * 
+   */
+  public DbDriverBase() {
+    super();
   }
 
-  protected String getProp(String name)
-  {
+  @Override
+  public void setProperties(Properties props) {
+    this.props_ = props;
+    this.sqlFormatted_ = getBoolProp(SqlTool.SQL_FORMATTED);
+  }
+
+  protected String getProp(String name) {
     String result = null;
 
     if (this.props_ != null) {
@@ -40,8 +51,7 @@ public abstract class DbDriverBase
     return (result == null) ? "" : result;
   }
 
-  protected Integer getIntProp(String name)
-  {
+  protected Integer getIntProp(String name) {
     try {
       return new Integer(getProp(name));
     }
@@ -51,18 +61,24 @@ public abstract class DbDriverBase
     return null;
   }
 
-  protected Boolean getBoolProp(String name)
-  {
-    return getProp(name).equalsIgnoreCase("true");
+  protected Boolean getBoolProp(String name) {
+    try {
+      return getProp(name).equalsIgnoreCase("true");
+    }
+    catch (NullPointerException e) {
+      // IGNORE
+    }
+    return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.DbDriver#getSchemaXmlWriter(java.io.PrintWriter)
    */
   @Override
-  public SchemaGenerator getSchemaXmlWriter(PrintWriter writer)
-  {
-    return new SchemaXmlWriter(writer);
+  public SchemaGenerator getSchemaXmlWriter(PrintWriter writer) {
+    return new SchemaXmlWriter(this, writer);
   }
 
   /**
@@ -75,29 +91,33 @@ public abstract class DbDriverBase
    */
   public abstract Map<TypeClass, String> getType2NameMap();
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.DbDriver#string2Type(java.lang.String)
    */
   @Override
-  public TypeClass string2Type(String name)
-  {
+  public TypeClass string2Type(String name) {
     Map<String, TypeClass> map = getName2TypeMap();
 
     return map.containsKey(name) ? map.get(name) : null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.DbDriver#type2String(nl.rakis.sql.ddl.model.TypeClass)
    */
   @Override
-  public String type2String(TypeClass type)
-  {
+  public String type2String(TypeClass type) {
     Map<TypeClass, String> map = getType2NameMap();
 
     return map.containsKey(type) ? map.get(type) : null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.DbDriver#getSchemaXmlReader(java.io.Reader)
    */
   @Override
@@ -105,8 +125,28 @@ public abstract class DbDriverBase
     SchemaXmlLoader loader = new SchemaXmlLoader();
     loader.setDriver(this);
     loader.setReader(reader);
-  
+
     return loader;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.DbDriver#isSqlFormatted()
+   */
+  @Override
+  public boolean isSqlFormatted() {
+    return sqlFormatted_;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.DbDriver#setSqlFormatted(boolean)
+   */
+  @Override
+  public void setSqlFormatted(boolean sqlFormatted) {
+    sqlFormatted_ = sqlFormatted;
   }
 
 }

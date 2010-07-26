@@ -123,4 +123,50 @@ public class Type
     return countInChars_;
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return buildTypeString(this.clazz_.name());
+  }
+
+  /**
+   * @param name
+   * @return
+   */
+  public String buildTypeString(String typeName) {
+    StringBuffer buf = new StringBuffer();
+
+    buf.append(typeName);
+    if (this.clazz_.hasLength() && (this.length_ != null)) {
+      buf.append('(');
+      if (this.length_ == -1) {
+        buf.append("MAX");
+      }
+      else {
+        buf.append(Integer.toString(this.length_));
+        if (this.countInChars_) {
+          buf.append(" CHARS");
+        }
+        else {
+          buf.append(" BYTES");
+        }
+      }
+      buf.append(')');
+    }
+    else if (this.clazz_.hasPrecision() || this.clazz_.hasScale()) {
+      buf.append('(');
+      if (this.clazz_.hasPrecision() && (this.precision_ != null)) {
+        buf.append(this.precision_.toString());
+      }
+      if (this.clazz_.hasScale() && (this.scale_ != null)) {
+        buf.append(';').append(this.scale_.toString());
+      }
+      buf.append(')');
+    }
+
+    return buf.toString();
+  }
+
 }

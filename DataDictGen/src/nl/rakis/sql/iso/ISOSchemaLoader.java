@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import nl.rakis.sql.ddl.SchemaLoader;
 import nl.rakis.sql.ddl.SchemaLoaderBase;
+import nl.rakis.sql.ddl.model.CheckConstraint;
 import nl.rakis.sql.ddl.model.Column;
 import nl.rakis.sql.ddl.model.ColumnedConstraint;
 import nl.rakis.sql.ddl.model.ConstraintType;
@@ -27,12 +28,14 @@ import nl.rakis.sql.ddl.model.UniqueConstraint;
  * @author bertl
  * 
  */
-public class ISOSchemaLoader extends SchemaLoaderBase
+public class ISOSchemaLoader
+  extends SchemaLoaderBase
   implements SchemaLoader
 {
   private static final String SELECT_TABLES_QUERY_      = "SELECT * FROM information_schema.tables WHERE table_schema = ?";
   private static final String SELECT_TABCOLS_QUERY_     = "SELECT * FROM information_schema.columns WHERE table_schema=? AND table_name=? ORDER BY ordinal_position";
   private static final String SELECT_CONSTRAINTS_QUERY_ = "SELECT * FROM information_schema.table_constraints WHERE table_schema=? AND table_name=?";
+  private static final String SELECT_CHECK_CLAUSE_      = "SELECT check_clause FROM information_schema.check_constraints WHERE (constraint_schema=?)AND(constraint_name=?)";
   private static final String SELECT_CONSCOLS_QUERY_    = "SELECT column_name FROM information_schema.key_column_usage WHERE constraint_schema=? AND constraint_name=? ORDER BY ordinal_position";
   private static final String SELECT_REFCONS_QUERY_     = "SELECT uk.table_name,fk.unique_constraint_name,fk.update_rule,fk.delete_rule FROM information_schema.referential_constraints fk INNER JOIN information_schema.table_constraints uk ON (uk.constraint_schema=fk.unique_constraint_schema)AND(uk.constraint_name=fk.unique_constraint_name) WHERE fk.constraint_schema=? AND fk.constraint_name=?";
   private static final String SELECT_INDICES_QUERY_     = "SELECT i.name,i.object_id,i.index_id,i.is_unique FROM sys.objects AS o INNER JOIN sys.indexes AS i ON o.object_id = i.object_id WHERE (o.schema_id = SCHEMA_ID(?)) AND (o.name=?) AND (i.name IS NOT NULL)";
@@ -62,26 +65,46 @@ public class ISOSchemaLoader extends SchemaLoaderBase
     if (type == null) {
       System.err.println("Unknown type: " + typeName);
     }
-    result.setType(type);
 
-    final Integer charLength = (Integer) rs
-        .getObject("character_maximum_length");
-    final Integer byteLength = (Integer) rs.getObject("character_octet_length");
-
-    if (charLength != null) {
-      type.setCountInChars(true);
-      type.setLength(charLength);
+    if (this.getDriver().getMaxedVars().contains(typeName)) {
+      type.setLength(-1);
     }
-    else if (byteLength != null) {
-      type.setCountInChars(false);
-      type.setLength(byteLength);
+    else {
+      switch (clazz) {
+      case CHAR:
+      case NCHAR:
+      case VARCHAR:
+      case NVARCHAR:
+        final Integer charLength = (Integer) rs
+            .getObject("character_maximum_length");
+        final Integer byteLength = (Integer) rs
+            .getObject("character_octet_length");
+
+        if (charLength != null) {
+          type.setCountInChars(true);
+          type.setLength(charLength);
+        }
+        else if (byteLength != null) {
+          type.setCountInChars(false);
+          type.setLength(byteLength);
+        }
+
+        break;
+      case DECIMAL:
+        type.setPrecision((Integer) rs.getObject("numeric_precision"));
+        type.setScale((Integer) rs.getObject("numeric_scale"));
+        break;
+
+      case DATE:
+      case TIME:
+      case TIMESTAMP:
+        type.setPrecision((Integer) rs.getObject("datetime_precision"));
+        break;
+      }
     }
-
-    type.setPrecision((Integer) rs.getObject("numeric_precision"));
-    type.setScale((Integer) rs.getObject("numeric_scale"));
-
     result.setType(type);
     result.setNullable(rs.getString("is_nullable").equalsIgnoreCase("yes"));
+    result.setDefault(rs.getString("column_default"));
 
     return result;
   }
@@ -143,10 +166,12 @@ public class ISOSchemaLoader extends SchemaLoaderBase
           constraint.setDeleteRule(rs.getString(4));
         }
         else if (refTable == null) {
-          System.err.println("Cannot find referred table \""+tableName+"\"");
+          System.err
+              .println("Cannot find referred table \"" + tableName + "\"");
         }
         else {
-          System.err.println("Cannot find referred key \""+consName+"\" in table \""+tableName+"\"");
+          System.err.println("Cannot find referred key \"" + consName +
+                             "\" in table \"" + tableName + "\"");
         }
       }
     }
@@ -160,7 +185,7 @@ public class ISOSchemaLoader extends SchemaLoaderBase
   private void fixReferences(Schema schema)
     throws SQLException
   {
-    for (Table table: schema.getTables()) {
+    for (Table table : schema.getTables()) {
       for (ForeignKeyConstraint fk : table.getForeignKeys()) {
         fixReferredConstraint(fk);
       }
@@ -194,6 +219,33 @@ public class ISOSchemaLoader extends SchemaLoaderBase
     }
   }
 
+  private PreparedStatement getCheckClause_ = null;
+
+  private void getCheckClause(CheckConstraint check)
+    throws SQLException
+  {
+    if (getCheckClause_ == null) {
+      getCheckClause_ = this.getDb().prepareStatement(SELECT_CHECK_CLAUSE_);
+    }
+    getCheckClause_.setString(1, check.getSchema().getName());
+    getCheckClause_.setString(2, check.getName());
+
+    ResultSet rs = null;
+
+    try {
+      rs = getCheckClause_.executeQuery();
+
+      if (rs.next()) {
+        check.setExpression(rs.getString(1));
+      }
+    }
+    finally {
+      if (rs != null) {
+        rs.close();
+      }
+    }
+  }
+
   private PreparedStatement getCons = null;
 
   private void loadConstraints(Schema schema, Table table)
@@ -216,7 +268,10 @@ public class ISOSchemaLoader extends SchemaLoaderBase
 
         ConstraintType type = ConstraintType.getType(consType);
         if (type == CHECK) {
-          // TODO
+          CheckConstraint cons = new CheckConstraint(table, consName);
+          cons.setSchema(schema);
+          getCheckClause(cons);
+          table.addConstraint(cons);
         }
         else {
           ColumnedConstraint ccons = null;

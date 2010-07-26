@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.Set;
 
 import nl.rakis.sql.ddl.SchemaGenerator;
 import nl.rakis.sql.ddl.SchemaLoader;
@@ -81,7 +82,7 @@ public interface DbDriver
   /**
    * @return
    */
-  SchemaGenerator getSchemaCreator();
+  SchemaGenerator getSchemaGenerator(Connection db);
 
   /**
    * @param writer
@@ -119,8 +120,24 @@ public interface DbDriver
   TypeClass string2Type(String name);
 
   /**
+   * @return the set of typenames which have size "MAX".
+   */
+  Set<String> getMaxedVars();
+
+  /**
    * @param type
    * @return
    */
   String buildTypeString(Type type);
+
+  /**
+   * @return
+   */
+  boolean isSqlFormatted();
+
+  /**
+   * @param sqlFormatted
+   */
+  void setSqlFormatted(boolean sqlFormatted);
+
 }

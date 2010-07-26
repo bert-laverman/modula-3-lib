@@ -10,9 +10,8 @@ import nl.rakis.sql.ddl.model.Schema;
  * @author bertl
  * 
  */
-public class GenXML
+public class CreateSchema
 {
-
   public static void main(String[] args)
   {
     SqlTool.init(args);

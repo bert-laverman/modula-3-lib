@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import nl.rakis.sql.DbDriver;
 import nl.rakis.sql.ddl.model.Column;
 import nl.rakis.sql.ddl.model.Constraint;
 import nl.rakis.sql.ddl.model.ForeignKeyConstraint;
@@ -57,9 +58,9 @@ public class SchemaXmlWriter
   /**
    * @param writer
    */
-  public SchemaXmlWriter(PrintWriter writer)
+  public SchemaXmlWriter(DbDriver driver, PrintWriter writer)
   {
-    super(writer);
+    super(driver, writer);
   }
 
   /* (non-Javadoc)
@@ -81,11 +82,13 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Table)
    */
   @Override
-  public void create(Table table)
+  public void create(Table...tables)
   {
     try {
       init();
-      this.marshaller_.marshal(table, getWriter());
+      for (Table table: tables) {
+        this.marshaller_.marshal(table, getWriter());
+      }
     }
     catch (JAXBException e) {
       e.printStackTrace();
@@ -96,11 +99,13 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Column)
    */
   @Override
-  public void create(Column column)
+  public void create(Column...columns)
   {
     try {
       init();
-      this.marshaller_.marshal(column, getWriter());
+      for (Column column: columns) {
+        this.marshaller_.marshal(column, getWriter());
+      }
     }
     catch (JAXBException e) {
       e.printStackTrace();
@@ -111,11 +116,13 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Constraint)
    */
   @Override
-  public void create(Constraint cons)
+  public void create(Constraint...constraints)
   {
     try {
       init();
-      this.marshaller_.marshal(cons, getWriter());
+      for (Constraint cons: constraints) {
+        this.marshaller_.marshal(cons, getWriter());
+      }
     }
     catch (JAXBException e) {
       e.printStackTrace();
@@ -126,11 +133,13 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Index)
    */
   @Override
-  public void create(Index index)
+  public void create(Index...indices)
   {
     try {
       init();
-      this.marshaller_.marshal(index, getWriter());
+      for (Index index: indices) {
+        this.marshaller_.marshal(index, getWriter());
+      }
     }
     catch (JAXBException e) {
       e.printStackTrace();
@@ -141,7 +150,7 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Table)
    */
   @Override
-  public void drop(Table table)
+  public void drop(Table...tables)
   {
     // IGNORE
   }
@@ -150,7 +159,7 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Column)
    */
   @Override
-  public void drop(Column cons)
+  public void drop(Column...columns)
   {
     // IGNORE
   }
@@ -159,7 +168,7 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Constraint)
    */
   @Override
-  public void drop(Constraint cons)
+  public void drop(Constraint...constraints)
   {
     // IGNORE
   }
@@ -168,7 +177,7 @@ public class SchemaXmlWriter
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Index)
    */
   @Override
-  public void drop(Index index)
+  public void drop(Index...indices)
   {
     // IGNORE
   }
