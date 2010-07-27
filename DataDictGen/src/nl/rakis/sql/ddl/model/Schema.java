@@ -29,17 +29,21 @@ public class Schema
   /**
    * 
    */
-  private static final long          serialVersionUID = 1L;
+  private static final long  serialVersionUID = 1L;
 
-  private Collection<Table>                tables_          = new TreeSet<Table>();
+  private Collection<Table>  tables_          = new TreeSet<Table>();
 
-  private Map<String, Table>         tableMap_        = new TreeMap<String, Table>();
+  private Map<String, Table> tableMap_        = new TreeMap<String, Table>();
+
+  private Collection<View>   views_           = new TreeSet<View>();
+
+  private Map<String, View>  viewMap_         = new TreeMap<String, View>();
 
   /**
-   * @param tables the tables to set
+   * @param tables
+   *          the tables to set
    */
-  public void setTables(Collection<Table> tables)
-  {
+  public void setTables(Collection<Table> tables) {
     this.tables_.clear();
     for (Table table : tables) {
       addTable(table);
@@ -51,14 +55,13 @@ public class Schema
    */
   @XmlElementWrapper(name = "tables", required = true, nillable = true)
   @XmlElement(name = "table", required = false)
-  public Collection<Table> getTables()
-  {
+  public Collection<Table> getTables() {
     if (this.tableMap_.size() != this.tables_.size()) {
       this.tableMap_.clear();
-      for (Table table: this.tables_){ 
+      for (Table table : this.tables_) {
         this.tableMap_.put(table.getName().toLowerCase(), table);
         table.setSchema(this);
-        for (Constraint constraint: table.getConstraints()) {
+        for (Constraint constraint : table.getConstraints()) {
           constraint.setSchema(this);
         }
       }
@@ -70,12 +73,11 @@ public class Schema
   /**
    * @param table
    */
-  public void addTable(Table table)
-  {
+  public void addTable(Table table) {
     this.tables_.add(table);
     this.tableMap_.put(table.getName().toLowerCase(), table);
     table.setSchema(this);
-    for (Constraint constraint: table.getConstraints()) {
+    for (Constraint constraint : table.getConstraints()) {
       constraint.setSchema(this);
     }
   }
@@ -84,14 +86,13 @@ public class Schema
    * @param name
    * @return
    */
-  public Table getTable(String name)
-  {
+  public Table getTable(String name) {
     if (this.tableMap_.size() != this.tables_.size()) {
       this.tableMap_.clear();
-      for (Table table: this.tables_){ 
+      for (Table table : this.tables_) {
         this.tableMap_.put(table.getName().toLowerCase(), table);
         table.setSchema(this);
-        for (Constraint constraint: table.getConstraints()) {
+        for (Constraint constraint : table.getConstraints()) {
           constraint.setSchema(this);
         }
       }
@@ -102,6 +103,53 @@ public class Schema
 
     if (this.tableMap_.containsKey(name)) {
       result = this.tableMap_.get(name);
+    }
+    return result;
+  }
+
+  /**
+   * @param views the views to set
+   */
+  public void setViews(Collection<View> views) {
+    views_ = views;
+  }
+
+  /**
+   * @return the views
+   */
+  @XmlElementWrapper(name = "views", required = true, nillable = true)
+  @XmlElement(name = "view", required = false)
+  public Collection<View> getViews() {
+    return views_;
+  }
+
+  /**
+   * @param view
+   */
+  public void addView(View view) {
+    this.views_.add(view);
+    this.viewMap_.put(view.getName().toLowerCase(), view);
+    view.setSchema(this);
+  }
+
+  /**
+   * @param name
+   * @return
+   */
+  public View getView(String name) {
+    if (this.viewMap_.size() != this.views_.size()) {
+      this.viewMap_.clear();
+      for (View view : this.views_) {
+        this.viewMap_.put(view.getName().toLowerCase(), view);
+        view.setSchema(this);
+      }
+    }
+
+    View result = null;
+    name = name.toLowerCase();
+
+    if (this.viewMap_.containsKey(name)) {
+      result = this.viewMap_.get(name);
     }
     return result;
   }

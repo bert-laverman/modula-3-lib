@@ -16,7 +16,9 @@ import nl.rakis.sql.ddl.model.ForeignKeyConstraint;
 import nl.rakis.sql.ddl.model.Index;
 import nl.rakis.sql.ddl.model.NamedObject;
 import nl.rakis.sql.ddl.model.SchemaObject;
+import nl.rakis.sql.ddl.model.Sequence;
 import nl.rakis.sql.ddl.model.Table;
+import nl.rakis.sql.ddl.model.View;
 
 /**
  * @author bertl
@@ -90,7 +92,26 @@ public abstract class SqlServerSchemaWriterBase
     appendName(buf, column);
     buf.append(' ').append(getDriver().buildTypeString(column.getType()))
         .append(' ').append(column.isNullable() ? "NULL" : "NOT NULL");
-    if (column.getDefault() != null) {
+    if (column.getSequence() != null) {
+      Sequence seq = column.getSequence();
+
+      buf.append(" IDENTITY(");
+      if (seq.getStart() != null) {
+        buf.append(seq.getStart().toString());
+      }
+      else {
+        buf.append('1');
+      }
+      buf.append(',');
+      if (seq.getIncrement() != null) {
+        buf.append(seq.getIncrement().toString());
+      }
+      else {
+        buf.append('1');
+      }
+      buf.append(')');
+    }
+    else if (column.getDefault() != null) {
       buf.append(" DEFAULT ").append(column.getDefault());
     }
   }
@@ -152,6 +173,34 @@ public abstract class SqlServerSchemaWriterBase
           appendName(buf, columnName);
         }
         buf.append(')');
+
+        if (key.getDeleteRule() != null) {
+          String action = getDriver()
+              .referenceAction2String(key.getDeleteRule());
+          if (action != null) {
+            if (doFormat) {
+              buf.append("\n      ");
+            }
+            else {
+              buf.append(' ');
+            }
+            buf.append("ON DELETE ").append(action);
+          }
+        }
+
+        if (key.getUpdateRule() != null) {
+          String action = getDriver()
+              .referenceAction2String(key.getUpdateRule());
+          if (action != null) {
+            if (doFormat) {
+              buf.append("\n      ");
+            }
+            else {
+              buf.append(' ');
+            }
+            buf.append("ON UPDATE ").append(action);
+          }
+        }
       }
     }
     else if (constraint instanceof CheckConstraint) {
@@ -373,6 +422,33 @@ public abstract class SqlServerSchemaWriterBase
 
     buf.append("DROP INDEX ");
     appendName(buf, index);
+
+    return buf.toString();
+  }
+
+  /**
+   * @param view
+   * @return
+   */
+  public String getCreateDdl(View view) {
+    StringBuffer buf = new StringBuffer();
+
+    buf.append("CREATE VIEW ");
+    appendName(buf, view);
+    buf.append(" AS ").append(view.getDefinition());
+
+    return buf.toString();
+  }
+
+  /**
+   * @param view
+   * @return
+   */
+  public String getDropDdl(View view) {
+    StringBuffer buf = new StringBuffer();
+
+    buf.append("DROP VIEW ");
+    appendName(buf, view);
 
     return buf.toString();
   }

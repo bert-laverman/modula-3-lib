@@ -34,8 +34,11 @@ public class Column
   @XmlElement(name = "nullable", required = true, nillable = false)
   private boolean           nullable_;
 
-  @XmlElement(name = "default-value", required = false, nillable = true)
+  @XmlElement(name = "default-value", required = false, nillable = false)
   private String            default_;
+
+  @XmlElement(name = "sequence", required = false, nillable = false)
+  private Sequence          sequence_;
 
   /**
    * 
@@ -97,7 +100,8 @@ public class Column
   }
 
   /**
-   * @param _default the default to set
+   * @param _default
+   *          the default to set
    */
   public void setDefault(String _default) {
     default_ = _default;
@@ -108,5 +112,20 @@ public class Column
    */
   public String getDefault() {
     return default_;
+  }
+
+  /**
+   * @param sequence
+   *          the sequence to set
+   */
+  public void setSequence(Sequence sequence) {
+    sequence_ = sequence;
+  }
+
+  /**
+   * @return the sequence
+   */
+  public Sequence getSequence() {
+    return sequence_;
   }
 }

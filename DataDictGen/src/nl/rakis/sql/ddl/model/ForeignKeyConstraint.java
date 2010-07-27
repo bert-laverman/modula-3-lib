@@ -30,9 +30,9 @@ public class ForeignKeyConstraint
 
   private ColumnedConstraint reference_       = null;
 
-  private String             updateRule_      = null;
+  private ReferenceAction    updateRule_      = null;
 
-  private String             deleteRule_      = null;
+  private ReferenceAction    deleteRule_      = null;
 
   public ForeignKeyConstraint() {
     super();
@@ -77,7 +77,8 @@ public class ForeignKeyConstraint
   }
 
   /**
-   * @param refTableName the refTableName to set
+   * @param refTableName
+   *          the refTableName to set
    */
   public void setRefTableName(String refTableName) {
     refTableName_ = refTableName;
@@ -92,7 +93,8 @@ public class ForeignKeyConstraint
   }
 
   /**
-   * @param refKeyName the refKeyName to set
+   * @param refKeyName
+   *          the refKeyName to set
    */
   public void setRefKeyName(String refKeyName) {
     refKeyName_ = refKeyName;
@@ -121,7 +123,8 @@ public class ForeignKeyConstraint
    */
   public ColumnedConstraint getReference() {
     if (this.reference_ == null) {
-      this.reference_ = getSchema().getTable(this.refTableName_).getColumnedConstraint(this.refKeyName_);
+      this.reference_ = getSchema().getTable(this.refTableName_)
+          .getColumnedConstraint(this.refKeyName_);
     }
     return reference_;
   }
@@ -130,7 +133,7 @@ public class ForeignKeyConstraint
    * @param updateRule
    *          the updateRule to set
    */
-  public void setUpdateRule(String updateRule) {
+  public void setUpdateRule(ReferenceAction updateRule) {
     updateRule_ = updateRule;
   }
 
@@ -138,7 +141,7 @@ public class ForeignKeyConstraint
    * @return the updateRule
    */
   @XmlElement(name = "update-rule", required = false)
-  public String getUpdateRule() {
+  public ReferenceAction getUpdateRule() {
     return updateRule_;
   }
 
@@ -146,7 +149,7 @@ public class ForeignKeyConstraint
    * @param deleteRule
    *          the deleteRule to set
    */
-  public void setDeleteRule(String deleteRule) {
+  public void setDeleteRule(ReferenceAction deleteRule) {
     deleteRule_ = deleteRule;
   }
 
@@ -154,7 +157,7 @@ public class ForeignKeyConstraint
    * @return the deleteRule
    */
   @XmlElement(name = "delete-rule", required = false)
-  public String getDeleteRule() {
+  public ReferenceAction getDeleteRule() {
     return deleteRule_;
   }
 

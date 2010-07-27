@@ -34,13 +34,13 @@ public class GenDataDict
    */
   private static final String INPUT   = "test.xml";
   private static final String OUTPUT_ = "test.html";
-  private static final String DBNAME_ = "CMS";
+  // private static final String DBNAME_ = "CMS";
   // private static final String DBNAME_ = "webapps";
-  private static final String SERVER_ = "localhost";
+  // private static final String SERVER_ = "localhost";
   // private static final String SERVER_ = "dune";
-  private static final String USER_   = "sa";
+  // private static final String USER_   = "sa";
   // private static final String USER_ = "postgres";
-  private static final String PWD_    = "Krwa2Krwa";
+  // private static final String PWD_    = "Krwa2Krwa";
   private static final String SCHEMA_ = "dbo";
 
   private static DbDriver     driver  = new JTDSDriver();

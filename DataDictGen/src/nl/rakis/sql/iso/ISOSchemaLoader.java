@@ -5,6 +5,7 @@ package nl.rakis.sql.iso;
 
 import static nl.rakis.sql.ddl.model.ConstraintType.CHECK;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +20,7 @@ import nl.rakis.sql.ddl.model.ForeignKeyConstraint;
 import nl.rakis.sql.ddl.model.Index;
 import nl.rakis.sql.ddl.model.PrimaryKeyConstraint;
 import nl.rakis.sql.ddl.model.Schema;
+import nl.rakis.sql.ddl.model.Sequence;
 import nl.rakis.sql.ddl.model.Table;
 import nl.rakis.sql.ddl.model.Type;
 import nl.rakis.sql.ddl.model.TypeClass;
@@ -33,7 +35,10 @@ public class ISOSchemaLoader
   implements SchemaLoader
 {
   private static final String SELECT_TABLES_QUERY_      = "SELECT * FROM information_schema.tables WHERE table_schema = ?";
-  private static final String SELECT_TABCOLS_QUERY_     = "SELECT * FROM information_schema.columns WHERE table_schema=? AND table_name=? ORDER BY ordinal_position";
+  private static final String SELECT_TABCOLS_QUERY_     = "SELECT c.*,CASE COLUMNPROPERTY(object_id(?), c.COLUMN_NAME, 'IsIdentity') WHEN 1 THEN IDENT_SEED(?) ELSE NULL END AS SEED,CASE COLUMNPROPERTY(object_id(?), c.COLUMN_NAME, 'IsIdentity') WHEN 1 THEN IDENT_INCR(?) ELSE NULL END AS INCR " +
+  		"FROM information_schema.columns c " +
+  		"WHERE table_schema=? AND table_name=? " +
+  		"ORDER BY ordinal_position";
   private static final String SELECT_CONSTRAINTS_QUERY_ = "SELECT * FROM information_schema.table_constraints WHERE table_schema=? AND table_name=?";
   private static final String SELECT_CHECK_CLAUSE_      = "SELECT check_clause FROM information_schema.check_constraints WHERE (constraint_schema=?)AND(constraint_name=?)";
   private static final String SELECT_CONSCOLS_QUERY_    = "SELECT column_name FROM information_schema.key_column_usage WHERE constraint_schema=? AND constraint_name=? ORDER BY ordinal_position";
@@ -106,6 +111,21 @@ public class ISOSchemaLoader
     result.setNullable(rs.getString("is_nullable").equalsIgnoreCase("yes"));
     result.setDefault(rs.getString("column_default"));
 
+    final BigDecimal seed = (BigDecimal) rs.getObject("SEED");
+    final BigDecimal incr = (BigDecimal) rs.getObject("INCR");
+
+    if ((seed != null) || (incr != null)) {
+      Sequence seq = new Sequence();
+
+      if (seed != null) {
+        seq.setStart(seed.intValue());
+      }
+      if (incr != null) {
+        seq.setIncrement(incr.intValue());
+      }
+
+      result.setSequence(seq);
+    }
     return result;
   }
 
@@ -117,8 +137,16 @@ public class ISOSchemaLoader
     if (getCols == null) {
       getCols = this.getDb().prepareStatement(SELECT_TABCOLS_QUERY_);
     }
-    getCols.setString(1, table.getSchema().getName());
-    getCols.setString(2, table.getName());
+    final String schemaName = table.getSchema().getName();
+    final String tableName = table.getName();
+    final String fullTableName = schemaName + "." + tableName;
+
+    getCols.setString(1, fullTableName);
+    getCols.setString(2, tableName);
+    getCols.setString(3, fullTableName);
+    getCols.setString(4, tableName);
+    getCols.setString(5, schemaName);
+    getCols.setString(6, tableName);
 
     ResultSet rs = null;
 
@@ -162,8 +190,8 @@ public class ISOSchemaLoader
 
         if ((refTable != null) && (key != null)) {
           constraint.setReference(key);
-          constraint.setUpdateRule(rs.getString(3));
-          constraint.setDeleteRule(rs.getString(4));
+          constraint.setUpdateRule(getDriver().string2ReferenceAction(rs.getString(3)));
+          constraint.setDeleteRule(getDriver().string2ReferenceAction(rs.getString(4)));
         }
         else if (refTable == null) {
           System.err

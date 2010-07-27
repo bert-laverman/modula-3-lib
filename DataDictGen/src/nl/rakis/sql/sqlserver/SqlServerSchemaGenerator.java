@@ -12,6 +12,7 @@ import nl.rakis.sql.ddl.model.Column;
 import nl.rakis.sql.ddl.model.Constraint;
 import nl.rakis.sql.ddl.model.Index;
 import nl.rakis.sql.ddl.model.Table;
+import nl.rakis.sql.ddl.model.View;
 
 /**
  * @author bertl
@@ -102,6 +103,18 @@ public class SqlServerSchemaGenerator
     }
   }
 
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.View[])
+   */
+  @Override
+  public void create(View... views) {
+    for (View view : views) {
+      final String ddlString = getCreateDdl(view);
+
+      executeDdl(ddlString);
+    }
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -156,6 +169,18 @@ public class SqlServerSchemaGenerator
   public void drop(Index... indices) {
     for (Index index : indices) {
       final String ddlString = getDropDdl(index);
+
+      executeDdl(ddlString);
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.View[])
+   */
+  @Override
+  public void drop(View... views) {
+    for (View view : views) {
+      final String ddlString = getDropDdl(view);
 
       executeDdl(ddlString);
     }

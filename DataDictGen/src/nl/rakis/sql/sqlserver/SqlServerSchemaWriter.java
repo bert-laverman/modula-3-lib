@@ -10,6 +10,7 @@ import nl.rakis.sql.ddl.model.Column;
 import nl.rakis.sql.ddl.model.Constraint;
 import nl.rakis.sql.ddl.model.Index;
 import nl.rakis.sql.ddl.model.Table;
+import nl.rakis.sql.ddl.model.View;
 
 /**
  * @author bertl
@@ -103,6 +104,22 @@ public class SqlServerSchemaWriter
   /*
    * (non-Javadoc)
    * 
+   * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.View[])
+   */
+  @Override
+  public void create(View... views) {
+    for (View view : views) {
+      final String ddlString = getCreateDdl(view);
+      final PrintWriter pw = getWriter();
+
+      pw.println(ddlString);
+      pw.println("GO");
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(java.io.PrintWriter,
    * nl.rakis.sql.ddl.model.Table)
    */
@@ -160,6 +177,22 @@ public class SqlServerSchemaWriter
   public void drop(Index... indices) {
     for (Index index : indices) {
       final String ddlString = getDropDdl(index);
+      final PrintWriter pw = getWriter();
+
+      pw.println(ddlString);
+      pw.println("GO");
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.View[])
+   */
+  @Override
+  public void drop(View... views) {
+    for (View view : views) {
+      final String ddlString = getDropDdl(view);
       final PrintWriter pw = getWriter();
 
       pw.println(ddlString);

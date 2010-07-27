@@ -20,6 +20,7 @@ import nl.rakis.sql.ddl.model.Table;
 import nl.rakis.sql.ddl.model.Type;
 import nl.rakis.sql.ddl.model.TypeClass;
 import nl.rakis.sql.ddl.model.UniqueConstraint;
+import nl.rakis.sql.ddl.model.View;
 
 /**
  * @author bertl
@@ -50,25 +51,24 @@ public class SchemaXmlWriter
   /**
    * 
    */
-  public SchemaXmlWriter()
-  {
+  public SchemaXmlWriter() {
     super();
   }
 
   /**
    * @param writer
    */
-  public SchemaXmlWriter(DbDriver driver, PrintWriter writer)
-  {
+  public SchemaXmlWriter(DbDriver driver, PrintWriter writer) {
     super(driver, writer);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Schema)
    */
   @Override
-  public void create(Schema schema)
-  {
+  public void create(Schema schema) {
     try {
       init();
       this.marshaller_.marshal(schema, getWriter());
@@ -78,15 +78,16 @@ public class SchemaXmlWriter
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Table)
    */
   @Override
-  public void create(Table...tables)
-  {
+  public void create(Table... tables) {
     try {
       init();
-      for (Table table: tables) {
+      for (Table table : tables) {
         this.marshaller_.marshal(table, getWriter());
       }
     }
@@ -95,15 +96,16 @@ public class SchemaXmlWriter
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Column)
    */
   @Override
-  public void create(Column...columns)
-  {
+  public void create(Column... columns) {
     try {
       init();
-      for (Column column: columns) {
+      for (Column column : columns) {
         this.marshaller_.marshal(column, getWriter());
       }
     }
@@ -112,15 +114,17 @@ public class SchemaXmlWriter
     }
   }
 
-  /* (non-Javadoc)
-   * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Constraint)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Constraint)
    */
   @Override
-  public void create(Constraint...constraints)
-  {
+  public void create(Constraint... constraints) {
     try {
       init();
-      for (Constraint cons: constraints) {
+      for (Constraint cons : constraints) {
         this.marshaller_.marshal(cons, getWriter());
       }
     }
@@ -129,15 +133,16 @@ public class SchemaXmlWriter
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.Index)
    */
   @Override
-  public void create(Index...indices)
-  {
+  public void create(Index... indices) {
     try {
       init();
-      for (Index index: indices) {
+      for (Index index : indices) {
         this.marshaller_.marshal(index, getWriter());
       }
     }
@@ -146,39 +151,70 @@ public class SchemaXmlWriter
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.SchemaGenerator#create(nl.rakis.sql.ddl.model.View[])
+   */
+  @Override
+  public void create(View... views) {
+    try {
+      init();
+      for (View view : views) {
+        this.marshaller_.marshal(view, getWriter());
+      }
+    }
+    catch (JAXBException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Table)
    */
   @Override
-  public void drop(Table...tables)
-  {
+  public void drop(Table... tables) {
     // IGNORE
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Column)
    */
   @Override
-  public void drop(Column...columns)
-  {
+  public void drop(Column... columns) {
     // IGNORE
   }
 
-  /* (non-Javadoc)
-   * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Constraint)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Constraint)
    */
   @Override
-  public void drop(Constraint...constraints)
-  {
+  public void drop(Constraint... constraints) {
     // IGNORE
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.Index)
    */
   @Override
-  public void drop(Index...indices)
-  {
+  public void drop(Index... indices) {
+    // IGNORE
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.View[])
+   */
+  @Override
+  public void drop(View... views) {
     // IGNORE
   }
 

@@ -81,6 +81,11 @@ public class SqlTool
   /**
    * 
    */
+  public static final String OUTPUT_FILE_MODE = "output.file.mode";
+
+  /**
+   * 
+   */
   public static final String     OUTPUT_FILE_NAME           = "output.file.name";
 
   /**
@@ -432,7 +437,16 @@ public class SqlTool
     if (schemaGenerator_ == null) {
       if (haveProp(OUTPUT_FILE) && getBoolProp(OUTPUT_FILE)) {
         schemaWriter_ = new PrintWriter(outputFileName_);
-        schemaGenerator_ = getInputDriver().getSchemaWriter(schemaWriter_);
+        if (haveProp(OUTPUT_FILE_MODE)) {
+          final String mode = getProp(OUTPUT_FILE_MODE);
+
+          if (mode.equalsIgnoreCase("xml")) {
+            schemaGenerator_ = getInputDriver().getSchemaXmlWriter(schemaWriter_);
+          }
+        }
+        if (schemaGenerator_ == null) {
+          schemaGenerator_ = getInputDriver().getSchemaWriter(schemaWriter_);
+        }
       }
       else if (haveProp(OUTPUT_DB) && getBoolProp(OUTPUT_DB)) {
         final String url = haveProp(OUTPUT_DB_PORT) ? getInputDriver()

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import nl.rakis.sql.ddl.SchemaGenerator;
 import nl.rakis.sql.ddl.SchemaLoader;
+import nl.rakis.sql.ddl.model.ReferenceAction;
 import nl.rakis.sql.ddl.model.Type;
 import nl.rakis.sql.ddl.model.TypeClass;
 
@@ -118,6 +119,18 @@ public interface DbDriver
    * @return
    */
   TypeClass string2Type(String name);
+
+  /**
+   * @param action
+   * @return
+   */
+  String referenceAction2String(ReferenceAction action);
+
+  /**
+   * @param action
+   * @return
+   */
+  ReferenceAction string2ReferenceAction(String action);
 
   /**
    * @return the set of typenames which have size "MAX".

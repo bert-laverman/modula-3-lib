@@ -13,6 +13,7 @@ import nl.rakis.sql.ddl.model.Index;
 import nl.rakis.sql.ddl.model.Schema;
 import nl.rakis.sql.ddl.model.Table;
 import nl.rakis.sql.ddl.model.UniqueConstraint;
+import nl.rakis.sql.ddl.model.View;
 
 /**
  * @author bertl
@@ -25,6 +26,7 @@ public abstract class SchemaWriterBase
   public static final Column[]     NO_COLUMNS     = {};
   public static final Constraint[] NO_CONSTRAINTS = {};
   public static final Index[]      NO_INDICES     = {};
+  public static final View[]       NO_VIEWS       = {};
 
   private DbDriver                 driver_;
   private PrintWriter              writer_;
@@ -63,14 +65,17 @@ public abstract class SchemaWriterBase
     create(schema.getTables().toArray(NO_TABLES));
     for (Table table : schema.getTables()) {
       create(table.getForeignKeys().toArray(NO_CONSTRAINTS));
-      for (UniqueConstraint uk: table.getUniqueKeys()) {
-        if ((table.getPrimaryKey() != null) && !uk.getName().equals(table.getPrimaryKey().getName())) {
+      for (UniqueConstraint uk : table.getUniqueKeys()) {
+        if ((table.getPrimaryKey() != null) &&
+            !uk.getName().equals(table.getPrimaryKey().getName()))
+        {
           create(uk);
         }
       }
       create(table.getCheckConstraints().toArray(NO_CONSTRAINTS));
       create(table.getNonKeyIndices().toArray(NO_INDICES));
     }
+    create(schema.getViews().toArray(NO_VIEWS));
   }
 
   /**

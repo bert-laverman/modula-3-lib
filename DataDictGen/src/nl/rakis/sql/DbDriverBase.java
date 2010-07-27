@@ -12,6 +12,7 @@ import nl.rakis.sql.ddl.SchemaGenerator;
 import nl.rakis.sql.ddl.SchemaLoader;
 import nl.rakis.sql.ddl.SchemaXmlLoader;
 import nl.rakis.sql.ddl.SchemaXmlWriter;
+import nl.rakis.sql.ddl.model.ReferenceAction;
 import nl.rakis.sql.ddl.model.TypeClass;
 
 /**
@@ -86,11 +87,6 @@ public abstract class DbDriverBase
    */
   public abstract Map<String, TypeClass> getName2TypeMap();
 
-  /**
-   * @return
-   */
-  public abstract Map<TypeClass, String> getType2NameMap();
-
   /*
    * (non-Javadoc)
    * 
@@ -103,6 +99,11 @@ public abstract class DbDriverBase
     return map.containsKey(name) ? map.get(name) : null;
   }
 
+  /**
+   * @return
+   */
+  public abstract Map<TypeClass, String> getType2NameMap();
+
   /*
    * (non-Javadoc)
    * 
@@ -113,6 +114,41 @@ public abstract class DbDriverBase
     Map<TypeClass, String> map = getType2NameMap();
 
     return map.containsKey(type) ? map.get(type) : null;
+  }
+
+  /**
+   * @return
+   */
+  public abstract Map<String, ReferenceAction> getName2ReferenceActionMap();
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.DbDriver#string2ReferenceAction(java.lang.String)
+   */
+  @Override
+  public ReferenceAction string2ReferenceAction(String action) {
+    Map<String, ReferenceAction> map = getName2ReferenceActionMap();
+
+    return map.containsKey(action) ? map.get(action) : null;
+  }
+
+  /**
+   * @return
+   */
+  public abstract Map<ReferenceAction, String> getReferenceAction2StringMap();
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @seenl.rakis.sql.DbDriver#referenceAction2String(nl.rakis.sql.ddl.model.
+   * ReferenceAction)
+   */
+  @Override
+  public String referenceAction2String(ReferenceAction action) {
+    Map<ReferenceAction, String> map = getReferenceAction2StringMap();
+
+    return map.containsKey(action) ? map.get(action) : null;
   }
 
   /*
