@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import nl.rakis.util.EqualsUtil;
+
 /**
  * @author bertl
  * 
@@ -159,6 +161,52 @@ public class ForeignKeyConstraint
   @XmlElement(name = "delete-rule", required = false)
   public ReferenceAction getDeleteRule() {
     return deleteRule_;
+  }
+
+  /**
+   * Two Foreign Key Constraints are the same if they are the same as
+   * ColumnedConstraint and have the same rules
+   * 
+   * @param that
+   * @return
+   */
+  public boolean same(ForeignKeyConstraint that) {
+    return same((ColumnedConstraint) that) &&
+           EqualsUtil.equals(this.updateRule_, that.updateRule_) &&
+           EqualsUtil.equals(this.deleteRule_, that.deleteRule_);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = (obj != null) && (obj instanceof ForeignKeyConstraint);
+
+    // To be equal:
+    // - Equal as ColumnedConstraint and same
+    // - Refer to the same table/columns
+    if (result) {
+      ForeignKeyConstraint that = (ForeignKeyConstraint) obj;
+
+      result = super.equals(that) && same(that) &&
+               EqualsUtil.equals(this.reference_, that.reference_);
+    }
+
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#toString()
+   */
+  @Override
+  public String toString() {
+    // TODO Auto-generated method stub
+    return super.toString();
   }
 
 }

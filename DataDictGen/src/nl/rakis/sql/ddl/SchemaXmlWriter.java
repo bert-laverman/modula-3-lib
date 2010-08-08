@@ -27,12 +27,16 @@ import nl.rakis.sql.ddl.model.View;
  * 
  */
 public class SchemaXmlWriter
-  extends SchemaWriterBase
+  extends SchemaGeneratorBase
 {
 
   private JAXBContext context_ = null;
+
   private Marshaller  marshaller_;
 
+  /**
+   * @throws JAXBException
+   */
   private void init()
     throws JAXBException
   {
@@ -60,6 +64,17 @@ public class SchemaXmlWriter
    */
   public SchemaXmlWriter(DbDriver driver, PrintWriter writer) {
     super(driver, writer);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.SchemaGeneratorBase#appendDef(java.lang.StringBuffer,
+   * nl.rakis.sql.ddl.model.Column)
+   */
+  @Override
+  public void appendDef(StringBuffer buf, Column column) {
+    // IGNORE
   }
 
   /*
@@ -210,12 +225,124 @@ public class SchemaXmlWriter
     // IGNORE
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see nl.rakis.sql.ddl.SchemaGenerator#drop(nl.rakis.sql.ddl.model.View[])
    */
   @Override
   public void drop(View... views) {
     // IGNORE
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * View)
+   */
+  public String getDropDdl(View view) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .View)
+   */
+  public String getCreateDdl(View view) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Index)
+   */
+  public String getDropDdl(Index index) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Index)
+   */
+  public String getCreateDdl(Index index) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Constraint[])
+   */
+  public String getDropDdl(Constraint... constraints) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Constraint[])
+   */
+  public String getCreateDdl(Constraint... constraints) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Column[])
+   */
+  public String getDropDdl(Column... columns) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Column[])
+   */
+  public String getCreateDdl(Column... columns) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Table)
+   */
+  public String getDropDdl(Table table) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Table)
+   */
+  public String getCreateDdl(Table table) {
+    return null;
   }
 
 }

@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import nl.rakis.util.CompareUtil;
+
 /**
  * @author bertl
  * 
@@ -18,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "TypeType", factoryClass = ObjectFactory.class, factoryMethod = "createType")
 @XmlAccessorType(NONE)
 public class Type
-  implements Serializable
+  implements Serializable, Comparable<Type>
 {
 
   /**
@@ -123,12 +125,70 @@ public class Type
     return countInChars_;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return buildTypeString(this.clazz_.name());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = false;
+
+    if ((obj != null) && (obj instanceof Type)) {
+      Type that = (Type) obj;
+
+      result = this.clazz_.equals(that.clazz_) &&
+               (this.countInChars_ == that.countInChars_);
+
+      if (result) {
+        result = (this.precision_ != null) ? this.precision_
+            .equals(that.precision_) : (that.precision_ == null);
+      }
+      if (result) {
+        result = (this.scale_ != null) ? this.scale_.equals(that.scale_)
+            : (that.scale_ == null);
+      }
+      if (result) {
+        result = (this.length_ != null) ? this.length_.equals(that.length_)
+            : (that.length_ == null);
+      }
+    }
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    int result = this.clazz_.hashCode();
+
+    if (this.precision_ != null) {
+      result ^= (this.precision_ << 8);
+    }
+    if (this.scale_ != null) {
+      result ^= (this.scale_ << 16);
+    }
+    if (this.length_ != null) {
+      result ^= this.length_;
+    }
+    if (this.countInChars_) {
+      result ^= 0xaaaaaaaa;
+    }
+
+    return result;
   }
 
   /**
@@ -167,6 +227,28 @@ public class Type
     }
 
     return buf.toString();
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(Type o) {
+    int result = this.clazz_.compareTo(o.clazz_);
+
+    if (result == 0) {
+      result = CompareUtil.compare(this.length_, o.length_);
+    }
+    if (result == 0) {
+      result = CompareUtil.compare(this.scale_, o.scale_);
+    }
+    if (result == 0) {
+      result = CompareUtil.compare(this.precision_, o.precision_);
+    }
+    if (result == 0) {
+      result = CompareUtil.compare(this.countInChars_, o.countInChars_);
+    }
+    return result;
   }
 
 }

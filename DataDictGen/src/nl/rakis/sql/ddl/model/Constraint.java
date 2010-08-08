@@ -8,6 +8,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
+import nl.rakis.util.EqualsUtil;
+
 /**
  * @author bertl
  * 
@@ -16,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(NONE)
 abstract public class Constraint
   extends SchemaObject
+  implements Comparable<Constraint>
 {
 
   /**
@@ -30,16 +33,14 @@ abstract public class Constraint
   /**
    * 
    */
-  public Constraint()
-  {
+  public Constraint() {
     super();
   }
 
   /**
    * 
    */
-  public Constraint(Table table, ConstraintType type)
-  {
+  public Constraint(Table table, ConstraintType type) {
     super();
 
     this.table_ = table;
@@ -49,8 +50,7 @@ abstract public class Constraint
   /**
    * @param name
    */
-  public Constraint(Table table, String name, ConstraintType type)
-  {
+  public Constraint(Table table, String name, ConstraintType type) {
     super(name);
 
     this.table_ = table;
@@ -62,8 +62,7 @@ abstract public class Constraint
    * @param schema
    * @param name
    */
-  public Constraint(Table table, Schema schema, String name,
-                    ConstraintType type)
+  public Constraint(Table table, Schema schema, String name, ConstraintType type)
   {
     super(schema, name);
 
@@ -72,35 +71,79 @@ abstract public class Constraint
   }
 
   /**
-   * @param table the table to set
+   * @param table
+   *          the table to set
    */
-  public void setTable(Table table)
-  {
+  public void setTable(Table table) {
     this.table_ = table;
   }
 
   /**
    * @return the table
    */
-  public Table getTable()
-  {
+  public Table getTable() {
     return table_;
   }
 
   /**
-   * @param type the type to set
+   * @param type
+   *          the type to set
    */
-  public void setType(ConstraintType type)
-  {
+  public void setType(ConstraintType type) {
     this.type_ = type;
   }
 
   /**
    * @return the type
    */
-  public ConstraintType getType()
-  {
+  public ConstraintType getType() {
     return type_;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = (obj != null) && (obj instanceof Constraint);
+
+    // To be the same constraint:
+    // - Same name
+    // - Same schema
+    if (result) {
+      result = super.equals(obj);
+    }
+    // furthermore:
+    // - Same table
+    // - Same type
+    if (result) {
+      Constraint that = (Constraint) obj;
+
+      result = EqualsUtil.equals(this.table_, that.table_) && same(that);
+    }
+    return result;
+  }
+
+  /**
+   * Compares the Constraint type only. Table and name not important.
+   * 
+   * @param that
+   * @return
+   */
+  public boolean same(Constraint that) {
+    return EqualsUtil.equals(this.type_, that.type_);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(Constraint o) {
+    return getName().compareTo(o.getName());
   }
 
 }

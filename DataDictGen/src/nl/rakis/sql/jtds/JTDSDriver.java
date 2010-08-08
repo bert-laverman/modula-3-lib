@@ -15,7 +15,7 @@ import java.util.Set;
 import nl.rakis.sql.DbDriverBase;
 import nl.rakis.sql.ddl.SchemaLoader;
 import nl.rakis.sql.ddl.SchemaGenerator;
-import nl.rakis.sql.ddl.SchemaWriterBase;
+import nl.rakis.sql.ddl.SchemaGeneratorBase;
 import nl.rakis.sql.ddl.model.ReferenceAction;
 import nl.rakis.sql.ddl.model.Type;
 import nl.rakis.sql.ddl.model.TypeClass;
@@ -119,7 +119,7 @@ public class JTDSDriver
    */
   @Override
   public SchemaGenerator getSchemaWriter(PrintWriter writer) {
-    SchemaWriterBase result = new SqlServerSchemaWriter(this, writer);
+    SchemaGeneratorBase result = new SqlServerSchemaWriter(this, writer);
 
     return result;
   }

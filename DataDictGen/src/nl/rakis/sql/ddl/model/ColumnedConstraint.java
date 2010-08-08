@@ -13,6 +13,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
+import nl.rakis.util.EqualsUtil;
+
 /**
  * @author bertl
  * 
@@ -37,16 +39,14 @@ abstract public class ColumnedConstraint
   /**
    * 
    */
-  public ColumnedConstraint()
-  {
+  public ColumnedConstraint() {
     super();
   }
 
   /**
    * @param type
    */
-  public ColumnedConstraint(Table table, ConstraintType type)
-  {
+  public ColumnedConstraint(Table table, ConstraintType type) {
     super(table, type);
   }
 
@@ -54,8 +54,7 @@ abstract public class ColumnedConstraint
    * @param name
    * @param type
    */
-  public ColumnedConstraint(Table table, String name, ConstraintType type)
-  {
+  public ColumnedConstraint(Table table, String name, ConstraintType type) {
     super(table, name, type);
   }
 
@@ -79,7 +78,8 @@ abstract public class ColumnedConstraint
   }
 
   /**
-   * @param columnNames the columnNames to set
+   * @param columnNames
+   *          the columnNames to set
    */
   public void setColumnNames(List<String> columnNames) {
     this.columns_.clear();
@@ -87,14 +87,14 @@ abstract public class ColumnedConstraint
   }
 
   /**
-   * @param columns the columns to set
+   * @param columns
+   *          the columns to set
    */
-  public void setColumns(List<Column> columns)
-  {
+  public void setColumns(List<Column> columns) {
     this.columns_.clear();
     this.columnNames_.clear();
-  
-    for (Column column: columns) {
+
+    for (Column column : columns) {
       addColumn(column);
     }
   }
@@ -102,8 +102,7 @@ abstract public class ColumnedConstraint
   /**
    * @return the columns
    */
-  public List<Column> getColumns()
-  {
+  public List<Column> getColumns() {
     if (this.columnNames_.size() > this.columns_.size()) {
       this.columns_.clear();
       for (String columnName : this.columnNames_) {
@@ -113,16 +112,47 @@ abstract public class ColumnedConstraint
     return columns_;
   }
 
-  public void addColumn(Column column)
-  {
+  public void addColumn(Column column) {
     this.columns_.add(column);
     this.columnNames_.add(column.getName());
   }
 
-  public void addColumn(String name)
-  {
+  public void addColumn(String name) {
     this.columns_.add(this.getTable().getColumn(name));
     this.columnNames_.add(name);
+  }
+
+  /**
+   * Two ColumnedConstraints are the same if they have the same type and cover
+   * the same column(name)s
+   * 
+   * @param that
+   * @return
+   */
+  public boolean same(ColumnedConstraint that) {
+    return same((Constraint)that) &&
+           EqualsUtil.equals(this.getColumnNames(), that.getColumnNames());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = (obj != null) && (obj instanceof ColumnedConstraint) &&
+                     super.equals(obj);
+
+    // Two constraints are equal if:
+    // - equal as Constraint and same
+    if (result) {
+      ColumnedConstraint that = (ColumnedConstraint) obj;
+
+      result = same(that);
+    }
+
+    return result;
   }
 
 }

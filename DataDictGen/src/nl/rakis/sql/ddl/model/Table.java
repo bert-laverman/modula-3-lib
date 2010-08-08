@@ -377,4 +377,24 @@ public class Table
     return this.getName().compareTo(that.getName());
   }
 
+  /**
+   * Two tables are the same if they have the same columns and constraints.
+   *
+   * @param that
+   * @return
+   */
+  public boolean same(Table that) {
+    boolean result = true;
+
+    if (this.columnMap_.keySet().equals(that.columnMap_.keySet())) {
+      for (Column column: this.columns_) {
+        if (!column.same(that.getColumn(column.getName()))) {
+          result = false;
+          break;
+        }
+      }
+    }
+
+    return result;
+  }
 }

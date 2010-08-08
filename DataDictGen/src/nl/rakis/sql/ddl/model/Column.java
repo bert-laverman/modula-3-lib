@@ -9,6 +9,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import nl.rakis.util.CompareUtil;
+import nl.rakis.util.EqualsUtil;
+import nl.rakis.util.HashUtil;
+
 /**
  * @author bertl
  * 
@@ -17,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(NONE)
 public class Column
   extends NamedObject
+  implements Comparable<Column>
 {
 
   /**
@@ -128,4 +133,79 @@ public class Column
   public Sequence getSequence() {
     return sequence_;
   }
+
+  /**
+   * Two Columns are the same if they have the same type and have the same properties
+   * @param that
+   * @return
+   */
+  public boolean same(Column that) {
+    return this.type_.equals(that.type_) &&
+           (this.nullable_ == that.nullable_) &&
+           EqualsUtil.equals(this.default_, that.default_) &&
+           EqualsUtil.equals(this.sequence_, that.sequence_);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = false;
+
+    if ((obj != null) && (obj instanceof Column)) {
+      Column that = (Column) obj;
+
+      result = super.equals(that) && same(that);
+    }
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return HashUtil.safeHash(getName()) + HashUtil.safeHash(type_) +
+           HashUtil.safeHash(default_) + HashUtil.safeHash(sequence_);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.NamedObject#toString()
+   */
+  @Override
+  public String toString() {
+    return "Column " + getName();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(Column o) {
+    int result = CompareUtil.compare(getName(), o.getName());
+
+    if (result == 0) {
+      result = CompareUtil.compare(this.nullable_, o.nullable_);
+    }
+    if (result == 0) {
+      result = CompareUtil.compare(this.type_, o.type_);
+    }
+    if (result == 0) {
+      result = CompareUtil.compare(this.default_, o.default_);
+    }
+    if (result == 0) {
+      result = CompareUtil.compare(this.sequence_, o.sequence_);
+    }
+    return result;
+  }
+
 }

@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
+import nl.rakis.util.EqualsUtil;
+
 /**
  * @author bertl
  * 
@@ -200,6 +202,42 @@ public class Index
    */
   public UniqueConstraint getConstraint() {
     return constraint_;
+  }
+
+  /**
+   * Two indices are the same if they have the same uniqueness and direction,
+   * and cover the same column names.
+   * 
+   * @param that
+   * @return
+   */
+  public boolean same(Index that) {
+    return (this.descending_ == that.descending_) &&
+           (this.unique_ == that.unique_) &&
+           EqualsUtil.equals(this.columnNames_, that.columnNames_);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.model.SchemaObject#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = (obj != null) && (obj instanceof Index);
+
+    // Two indices are the equal if:
+    // - They are equal as SchemaObject
+    // - Are on the same table
+    // - Are the same
+    if (result) {
+      Index that = (Index) obj;
+
+      result = super.equals(that) &&
+               EqualsUtil.equals(this.table_, that.table_) && same(that);
+    }
+
+    return result;
   }
 
 }

@@ -7,15 +7,10 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 
 import nl.rakis.sql.DbDriver;
-import nl.rakis.sql.ddl.SchemaWriterBase;
-import nl.rakis.sql.ddl.model.CheckConstraint;
+import nl.rakis.sql.ddl.SchemaGeneratorBase;
 import nl.rakis.sql.ddl.model.Column;
-import nl.rakis.sql.ddl.model.ColumnedConstraint;
 import nl.rakis.sql.ddl.model.Constraint;
-import nl.rakis.sql.ddl.model.ForeignKeyConstraint;
 import nl.rakis.sql.ddl.model.Index;
-import nl.rakis.sql.ddl.model.NamedObject;
-import nl.rakis.sql.ddl.model.SchemaObject;
 import nl.rakis.sql.ddl.model.Sequence;
 import nl.rakis.sql.ddl.model.Table;
 import nl.rakis.sql.ddl.model.View;
@@ -24,16 +19,18 @@ import nl.rakis.sql.ddl.model.View;
  * @author bertl
  * 
  */
-public abstract class SqlServerSchemaWriterBase
-  extends SchemaWriterBase
+/**
+ * @author bertl
+ * 
+ */
+public abstract class SqlServerSchemaGeneratorBase
+  extends SchemaGeneratorBase
 {
-
-  private boolean sqlFormatted_ = true;
 
   /**
    * 
    */
-  public SqlServerSchemaWriterBase() {
+  public SqlServerSchemaGeneratorBase() {
     super();
   }
 
@@ -41,52 +38,37 @@ public abstract class SqlServerSchemaWriterBase
    * @param driver
    * @param writer
    */
-  public SqlServerSchemaWriterBase(DbDriver driver, PrintWriter writer) {
+  public SqlServerSchemaGeneratorBase(DbDriver driver, PrintWriter writer) {
     super(driver, writer);
-
-    this.setSqlFormatted(driver.isSqlFormatted());
   }
 
   /**
    * @param driver
    * @param db
    */
-  public SqlServerSchemaWriterBase(DbDriver driver, Connection db) {
+  public SqlServerSchemaGeneratorBase(DbDriver driver, Connection db) {
     super(driver, db);
 
     this.setSqlFormatted(false);
   }
 
-  /**
-   * @param buf
-   * @param name
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#appendName(java.lang.StringBuffer,
+   * java.lang.String)
    */
+  @Override
   public void appendName(StringBuffer buf, String name) {
     buf.append('[').append(name).append(']');
   }
 
-  /**
-   * @param buf
-   * @param object
-   */
-  public void appendName(StringBuffer buf, NamedObject object) {
-    appendName(buf, object.getName());
-  }
-
-  /**
-   * @param buf
-   * @param object
-   */
-  public void appendName(StringBuffer buf, SchemaObject object) {
-    if (object.getSchema() != null) {
-      appendName(buf, object.getSchema());
-      buf.append('.');
-    }
-    appendName(buf, (NamedObject) object);
-  }
-
-  /**
-   * @param column
+  /*
+   * (non-Javadoc)
+   * 
+   * @see nl.rakis.sql.ddl.SchemaGeneratorBase#appendDef(java.lang.StringBuffer,
+   * nl.rakis.sql.ddl.model.Column)
    */
   public void appendDef(StringBuffer buf, Column column) {
     appendName(buf, column);
@@ -116,104 +98,14 @@ public abstract class SqlServerSchemaWriterBase
     }
   }
 
-  /**
-   * @param buf
-   * @param constraint
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Table)
    */
-  public void appendDef(StringBuffer buf, Constraint constraint) {
-    final boolean doFormat = isSqlFormatted();
-
-    buf.append("CONSTRAINT ");
-    appendName(buf, constraint.getName());
-    if (doFormat) {
-      buf.append("\n    ");
-    }
-    else {
-      buf.append(' ');
-    }
-    buf.append(constraint.getType().getName());
-    if (constraint instanceof ColumnedConstraint) {
-      ColumnedConstraint colCons = (ColumnedConstraint) constraint;
-
-      buf.append('(');
-      boolean doComma = false;
-      for (String columnName : colCons.getColumnNames()) {
-        if (doComma) {
-          buf.append(',');
-        }
-        else {
-          doComma = true;
-        }
-        appendName(buf, columnName);
-      }
-      buf.append(')');
-
-      if (constraint instanceof ForeignKeyConstraint) {
-        ForeignKeyConstraint key = (ForeignKeyConstraint) constraint;
-
-        if (doFormat) {
-          buf.append("\n    ");
-        }
-        else {
-          buf.append(' ');
-        }
-        final ColumnedConstraint refCons = key.getReference();
-
-        buf.append("REFERENCES ");
-        appendName(buf, refCons.getTable());
-        buf.append('(');
-        doComma = false;
-        for (String columnName : refCons.getColumnNames()) {
-          if (doComma) {
-            buf.append(',');
-          }
-          else {
-            doComma = true;
-          }
-          appendName(buf, columnName);
-        }
-        buf.append(')');
-
-        if (key.getDeleteRule() != null) {
-          String action = getDriver()
-              .referenceAction2String(key.getDeleteRule());
-          if (action != null) {
-            if (doFormat) {
-              buf.append("\n      ");
-            }
-            else {
-              buf.append(' ');
-            }
-            buf.append("ON DELETE ").append(action);
-          }
-        }
-
-        if (key.getUpdateRule() != null) {
-          String action = getDriver()
-              .referenceAction2String(key.getUpdateRule());
-          if (action != null) {
-            if (doFormat) {
-              buf.append("\n      ");
-            }
-            else {
-              buf.append(' ');
-            }
-            buf.append("ON UPDATE ").append(action);
-          }
-        }
-      }
-    }
-    else if (constraint instanceof CheckConstraint) {
-      CheckConstraint chkCons = (CheckConstraint) constraint;
-
-      buf.append(' ').append(chkCons.getExpression());
-    }
-  }
-
-  /**
-   * @param table
-   * @return
-   */
+  @Override
   public String getCreateDdl(Table table) {
     StringBuffer buf = new StringBuffer();
 
@@ -248,10 +140,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * @param table
-   * @return
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Table)
    */
+  @Override
   public String getDropDdl(Table table) {
     StringBuffer buf = new StringBuffer();
 
@@ -261,12 +157,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * NOTE: All columns are expected to be from the same table!
+  /*
+   * (non-Javadoc)
    * 
-   * @param columns
-   * @return
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Column[])
    */
+  @Override
   public String getCreateDdl(Column... columns) {
     StringBuffer buf = new StringBuffer();
 
@@ -291,12 +189,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * NOTE: All columns are expected to be from the same table!
+  /*
+   * (non-Javadoc)
    * 
-   * @param columns
-   * @return
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Column[])
    */
+  @Override
   public String getDropDdl(Column... columns) {
     StringBuffer buf = new StringBuffer();
 
@@ -321,12 +221,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * NOTE: All constraints are expected to be from the same table!
+  /*
+   * (non-Javadoc)
    * 
-   * @param constraints
-   * @return
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Constraint[])
    */
+  @Override
   public String getCreateDdl(Constraint... constraints) {
     StringBuffer buf = new StringBuffer();
 
@@ -351,12 +253,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * NOTE: All columns are expected to be from the same table!
+  /*
+   * (non-Javadoc)
    * 
-   * @param constraints
-   * @return
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Constraint[])
    */
+  @Override
   public String getDropDdl(Constraint... constraints) {
     StringBuffer buf = new StringBuffer();
 
@@ -381,10 +285,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * @param index
-   * @return
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model
+   * .Index)
    */
+  @Override
   public String getCreateDdl(Index index) {
     StringBuffer buf = new StringBuffer();
 
@@ -413,10 +321,14 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * @param index
-   * @return
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.
+   * Index)
    */
+  @Override
   public String getDropDdl(Index index) {
     StringBuffer buf = new StringBuffer();
 
@@ -426,10 +338,10 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * @param view
-   * @return
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.SchemaGeneratorBase#getCreateDdl(nl.rakis.sql.ddl.model.View)
    */
+  @Override
   public String getCreateDdl(View view) {
     StringBuffer buf = new StringBuffer();
 
@@ -440,10 +352,10 @@ public abstract class SqlServerSchemaWriterBase
     return buf.toString();
   }
 
-  /**
-   * @param view
-   * @return
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.SchemaGeneratorBase#getDropDdl(nl.rakis.sql.ddl.model.View)
    */
+  @Override
   public String getDropDdl(View view) {
     StringBuffer buf = new StringBuffer();
 
@@ -451,22 +363,6 @@ public abstract class SqlServerSchemaWriterBase
     appendName(buf, view);
 
     return buf.toString();
-  }
-
-  /**
-   * @param sqlFormatted
-   *          the sqlFormatted to set
-   */
-  public void setSqlFormatted(boolean sqlFormatted) {
-    System.err.println("setting formatting to " + sqlFormatted);
-    sqlFormatted_ = sqlFormatted;
-  }
-
-  /**
-   * @return the sqlFormatted
-   */
-  public boolean isSqlFormatted() {
-    return sqlFormatted_;
   }
 
 }
