@@ -90,7 +90,8 @@ public class Table
       }
     }
 
-    int n = this.foreignKeys_.size() + this.uniqueKeys_.size() + this.checkConstraints_.size();
+    int n = this.foreignKeys_.size() + this.uniqueKeys_.size() +
+            this.checkConstraints_.size();
     if (this.primaryKey_ != null) {
       n += 1;
     }
@@ -310,7 +311,8 @@ public class Table
   }
 
   /**
-   * @param checkConstraints the checkConstraints to set
+   * @param checkConstraints
+   *          the checkConstraints to set
    */
   public void setCheckConstraints(List<CheckConstraint> checkConstraints) {
     this.checkConstraints_ = checkConstraints;
@@ -379,7 +381,7 @@ public class Table
 
   /**
    * Two tables are the same if they have the same columns and constraints.
-   *
+   * 
    * @param that
    * @return
    */
@@ -387,14 +389,38 @@ public class Table
     boolean result = true;
 
     if (this.columnMap_.keySet().equals(that.columnMap_.keySet())) {
-      for (Column column: this.columns_) {
+      for (Column column : this.columns_) {
         if (!column.same(that.getColumn(column.getName()))) {
           result = false;
           break;
         }
       }
     }
+    if (result) {
+      result = (this.primaryKey_ == null) ? (that.primaryKey_ == null)
+          : ((that.primaryKey_ != null) && this.primaryKey_
+              .same(that.primaryKey_));
+    }
+    // Comparing ForeignKeyConstraints for similarity is expensive
+    // TODO Test it anyway
 
     return result;
   }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.model.SchemaObject#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    boolean result = (obj != null) && (obj instanceof Table);
+
+    if (result) {
+      Table that = (Table) obj;
+      result = super.equals(that);
+    }
+
+    return result;
+  }
+
+  
 }

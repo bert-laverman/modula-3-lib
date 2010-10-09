@@ -189,6 +189,7 @@ public class JTDSDriver
     private static final Set<String>                  maxedVars_ = new HashSet<String>();
 
     static {
+      maxedVars_.add("text");
       maxedVars_.add("ntext");
       maxedVars_.add("image");
     }

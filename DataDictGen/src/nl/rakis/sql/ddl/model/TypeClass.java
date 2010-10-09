@@ -10,12 +10,14 @@ package nl.rakis.sql.ddl.model;
 public enum TypeClass
 {
   BIT(false, true, false, false),
+  VARBIT(false, true, false, false),
   BYTE,
   SHORT,
   INT,
   LONG,
 
   REAL(false, true, false, false),
+  FLOAT,
   DOUBLE,
 
   DECIMAL(false, false, true, true),
