@@ -79,6 +79,7 @@ public class SchemaXmlLoader
 
     try {
       result = unmarshal();
+      result.fixReferences();
     }
     catch (JAXBException e) {
       // TODO Auto-generated catch block

@@ -40,6 +40,29 @@ public class Schema
   private Map<String, View>  viewMap_         = new TreeMap<String, View>();
 
   /**
+   * 
+   */
+  public Schema() {
+    super();
+  }
+
+  /**
+   * @param name
+   */
+  public Schema(String name) {
+    super(name);
+  }
+
+  public void fixReferences() {
+    for (Table table: tables_) {
+      table.fixReferences(this);
+    }
+    for (View view: views_) {
+      view.fixReferences(this);
+    }
+  }
+
+  /**
    * @param tables
    *          the tables to set
    */

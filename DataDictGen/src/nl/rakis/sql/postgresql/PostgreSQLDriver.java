@@ -100,8 +100,7 @@ public class PostgreSQLDriver
    */
   @Override
   public SchemaGenerator getSchemaGenerator(Connection db) {
-    // TODO Auto-generated method stub
-    return null;
+    return new PostgreSqlSchemaGenerator(this, db);
   }
 
   /*
@@ -111,8 +110,7 @@ public class PostgreSQLDriver
    */
   @Override
   public SchemaGenerator getSchemaWriter(PrintWriter writer) {
-    // TODO Auto-generated method stub
-    return null;
+    return new PostgreSqlSchemaWriter(this, writer);
   }
 
   /*
@@ -122,7 +120,7 @@ public class PostgreSQLDriver
    */
   @Override
   public SchemaLoader getSchemaLoader(Connection db) {
-    ISOSchemaLoader loader = new ISOSchemaLoader(); // TODO
+    ISOSchemaLoader loader = new PostgreSqlSchemaLoader(); // TODO
     loader.setDriver(this);
     loader.setDb(db);
 
@@ -136,6 +134,7 @@ public class PostgreSQLDriver
       static {
         tMap_.put("bit", TypeClass.BIT);
         tMap_.put("varbit", TypeClass.VARBIT); // BIT VARYING
+        tMap_.put("bit varying", TypeClass.VARBIT); // BIT VARYING
   
         tMap_.put("boolean", TypeClass.BOOLEAN);
   
@@ -155,6 +154,7 @@ public class PostgreSQLDriver
   //      tMap_.put("tinyint", TypeClass.BYTE); // 1 byte
         tMap_.put("float", TypeClass.FLOAT); // 1-24: 4 bytes, 25-53: 8 bytes
         tMap_.put("float4", TypeClass.FLOAT); // 1-24: 4 bytes, 25-53: 8 bytes
+        tMap_.put("double precision", TypeClass.DOUBLE); // 1-24: 4 bytes, 25-53: 8 bytes
         tMap_.put("float8", TypeClass.DOUBLE); // 1-24: 4 bytes, 25-53: 8 bytes
   //      tMap_.put("real", TypeClass.REAL); // == float(24)
         tMap_.put("numeric", TypeClass.DECIMAL); // max precision 38
@@ -165,7 +165,9 @@ public class PostgreSQLDriver
   //                                                    // the comma
     
         tMap_.put("char", TypeClass.CHAR);
+        tMap_.put("character", TypeClass.CHAR);
   //      tMap_.put("nchar", TypeClass.NCHAR);
+        tMap_.put("character varying", TypeClass.VARCHAR);
         tMap_.put("varchar", TypeClass.VARCHAR);
   //      tMap_.put("nvarchar", TypeClass.NVARCHAR);
         tMap_.put("text", TypeClass.VARCHAR); // == varchar(max)
@@ -177,12 +179,18 @@ public class PostgreSQLDriver
     
         tMap_.put("date", TypeClass.DATE); // 0001-01-01 through 9999-12-31
         tMap_.put("time", TypeClass.TIME); // 00:00:00.0000000 through
-                                           // 23:59:59.9999999
+        // 23:59:59.9999999
+        tMap_.put("time with timezone", TypeClass.TIME); // 00:00:00.0000000 through
+        // 23:59:59.9999999
+        tMap_.put("time without timezone", TypeClass.TIME); // 00:00:00.0000000 through
+        // 23:59:59.9999999
   //      tMap_.put("smalldatetime", TypeClass.TIMESTAMP); // 1900-01-01 to
                                                          // 2079-06-06, 00:00:00
                                                          // to 23:59:59
+        tMap_.put("timestamp with time zone", TypeClass.TIMESTAMP); // 1753-01-01 to 9999-12-31,
+        // 00:00:00 to 23:59:59.997
         tMap_.put("timestamp", TypeClass.TIMESTAMP); // 1753-01-01 to 9999-12-31,
-                                                     // 00:00:00 to 23:59:59.997
+        // 00:00:00 to 23:59:59.997
   //      tMap_.put("datetime", TypeClass.TIMESTAMP); // 1753-01-01 to 9999-12-31,
                                                     // 00:00:00 to 23:59:59.997
   //      tMap_.put("datetime2", TypeClass.TIMESTAMP); // 0001-01-01 to 9999-12-31,
@@ -192,7 +200,8 @@ public class PostgreSQLDriver
                                                           // 9999-12-31, 00:00:00
                                                           // to 23:59:59.9999999
         // interval
-  
+        tMap_.put("oid", TypeClass.INT); // 4 bytes
+
         // GEO types
         // box
         // circle
@@ -280,18 +289,17 @@ public class PostgreSQLDriver
       tMap_.put(TypeClass.BYTE, "tinyint");
       // tMap_.put(TypeClass.REAL, "float");
       tMap_.put(TypeClass.REAL, "real");
-      // tMap_.put(TypeClass.NUMBER, "numeric");
       // tMap_.put(TypeClass.DECIMAL, "dec");
-      tMap_.put(TypeClass.DECIMAL, "decimal");
+      tMap_.put(TypeClass.DECIMAL, "numeric");
       tMap_.put(TypeClass.MONEY, "money");
-      tMap_.put(TypeClass.SMALLMONEY, "smallmoney");
+      tMap_.put(TypeClass.SMALLMONEY, "money");
   
       tMap_.put(TypeClass.CHAR, "char");
       tMap_.put(TypeClass.NCHAR, "nchar");
       tMap_.put(TypeClass.VARCHAR, "varchar");
-      // tMap_.put(TypeClass.NVARCHAR, "nvarchar");
-      tMap_.put(TypeClass.VARCHAR, "text");
-      // tMap_.put(TypeClass.NVARCHAR, "ntext");
+      tMap_.put(TypeClass.NVARCHAR, "varchar");
+      //tMap_.put(TypeClass.VARCHAR, "text");
+      //tMap_.put(TypeClass.NVARCHAR, "ntext");
   
       // tMap_.put(TypeClass.BINARY, "binary");
       tMap_.put(TypeClass.VARBINARY, "bytea");
@@ -301,7 +309,7 @@ public class PostgreSQLDriver
       tMap_.put(TypeClass.TIME, "time");
       // tMap_.put(TypeClass.TIMESTAMP, "smalldatetime");
       // tMap_.put(TypeClass.TIMESTAMP, "timestamp");
-      tMap_.put(TypeClass.TIMESTAMP, "datetime");
+      tMap_.put(TypeClass.TIMESTAMP, "timestamp");
       // tMap_.put(TypeClass.TIMESTAMP, "datetime2");
       // tMap_.put(TypeClass.TIMESTAMP, "datetimeoffset");
     }
@@ -354,6 +362,7 @@ public class PostgreSQLDriver
       switch (clazz) {
 
       case VARCHAR:
+      case NVARCHAR:
         buf.append("text");
         break;
 

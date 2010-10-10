@@ -20,6 +20,7 @@ import nl.rakis.sql.ddl.model.ReferenceAction;
 import nl.rakis.sql.ddl.model.Type;
 import nl.rakis.sql.ddl.model.TypeClass;
 import nl.rakis.sql.iso.ISOSchemaLoader;
+import nl.rakis.sql.sqlserver.SQLServerSchemaLoader;
 import nl.rakis.sql.sqlserver.SqlServerSchemaGenerator;
 import nl.rakis.sql.sqlserver.SqlServerSchemaWriter;
 
@@ -131,7 +132,7 @@ public class JTDSDriver
    */
   @Override
   public SchemaLoader getSchemaLoader(Connection db) {
-    ISOSchemaLoader loader = new ISOSchemaLoader();
+    ISOSchemaLoader loader = new SQLServerSchemaLoader();
     loader.setDriver(this);
     loader.setDb(db);
 

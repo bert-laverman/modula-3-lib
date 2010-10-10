@@ -121,9 +121,6 @@ public class Table
       this.indexMap_.clear();
       this.nonKeyIndices_.clear();
       for (Index index : this.indices_) {
-        index.setSchema(getSchema());
-        index.setTable(this);
-
         this.indexMap_.put(index.getName(), index);
         if (!this.constraintMap_.containsKey(index.getName())) {
           this.nonKeyIndices_.add(index);
@@ -367,6 +364,23 @@ public class Table
     rebuild();
 
     return nonKeyIndices_;
+  }
+
+  @Override
+  public void fixReferences(Schema schema) {
+    super.fixReferences(schema);
+
+    setDirty(true);
+    rebuild();
+
+    for (Constraint constraint: this.constraints_) {
+      constraint.setTable(this);
+      constraint.fixReferences(schema);
+    }
+    for (Index index: this.indices_) {
+      index.setTable(this);
+      index.fixReferences(schema);
+    }
   }
 
   /*

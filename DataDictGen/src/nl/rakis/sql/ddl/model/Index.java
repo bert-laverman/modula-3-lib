@@ -125,6 +125,9 @@ public class Index
    * @return the table
    */
   public Table getTable() {
+    if (table_ == null) {
+      throw new NullPointerException("Index.getTable(): Don't know table of INDEX \""+getName()+"\"");
+    }
     return table_;
   }
 
@@ -202,6 +205,15 @@ public class Index
    */
   public UniqueConstraint getConstraint() {
     return constraint_;
+  }
+
+  /* (non-Javadoc)
+   * @see nl.rakis.sql.ddl.model.SchemaObject#fixReferences(nl.rakis.sql.ddl.model.Schema)
+   */
+  @Override
+  public void fixReferences(Schema schema) {
+    super.fixReferences(schema);
+    
   }
 
   /**

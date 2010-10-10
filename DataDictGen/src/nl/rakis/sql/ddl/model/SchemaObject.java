@@ -70,6 +70,13 @@ public abstract class SchemaObject
   }
 
   /**
+   * @param schema
+   */
+  public void fixReferences(Schema schema) {
+    setSchema(schema);
+  }
+
+  /**
    * Two schema objects the same? Can't decide without knowing what they are,
    * so no.
    * 

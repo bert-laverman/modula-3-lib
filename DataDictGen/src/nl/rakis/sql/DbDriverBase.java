@@ -113,7 +113,12 @@ public abstract class DbDriverBase
   public String type2String(TypeClass type) {
     Map<TypeClass, String> map = getType2NameMap();
 
-    return map.containsKey(type) ? map.get(type) : null;
+    String result = map.containsKey(type) ? map.get(type) : null;
+
+    if (result == null) {
+      System.err.println("No typename for "+type.name());
+    }
+    return result;
   }
 
   /**
