@@ -436,16 +436,15 @@ public class SqlTool
   {
     if (schemaGenerator_ == null) {
       if (haveProp(OUTPUT_FILE) && getBoolProp(OUTPUT_FILE)) {
-        schemaWriter_ = new PrintWriter(outputFileName_);
         if (haveProp(OUTPUT_FILE_MODE)) {
           final String mode = getProp(OUTPUT_FILE_MODE);
 
           if (mode.equalsIgnoreCase("xml")) {
-            schemaGenerator_ = getInputDriver().getSchemaXmlWriter(schemaWriter_);
+            schemaGenerator_ = getInputDriver().getSchemaXmlWriter(getWriter());
           }
         }
         if (schemaGenerator_ == null) {
-          schemaGenerator_ = getInputDriver().getSchemaWriter(schemaWriter_);
+          schemaGenerator_ = getInputDriver().getSchemaWriter(getWriter());
         }
       }
       else if (haveProp(OUTPUT_DB) && getBoolProp(OUTPUT_DB)) {
@@ -460,5 +459,17 @@ public class SqlTool
       }
     }
     return schemaGenerator_;
+  }
+
+  public static PrintWriter getWriter() throws FileNotFoundException {
+    if (schemaWriter_ == null) {
+      if (outputFileName_ != null) {
+        schemaWriter_ = new PrintWriter(outputFileName_);
+      }
+      else {
+        throw new FileNotFoundException("getWriter(): Output filename not specified.");
+      }
+    }
+    return schemaWriter_;
   }
 }
