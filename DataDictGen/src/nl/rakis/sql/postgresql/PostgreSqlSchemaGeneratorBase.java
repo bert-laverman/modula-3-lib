@@ -146,7 +146,6 @@ public abstract class PostgreSqlSchemaGeneratorBase
     if (columns.length > 0) {
       buf.append("ALTER TABLE ");
       appendName(buf, columns[0].getTable());
-      buf.append(" ADD ");
       boolean doComma = false;
       for (Column column : columns) {
         if (doComma) {
@@ -158,6 +157,7 @@ public abstract class PostgreSqlSchemaGeneratorBase
         if (isSqlFormatted()) {
           buf.append("\n  ");
         }
+        buf.append(" ADD COLUMN ");
         appendDef(buf, column);
       }
     }
@@ -178,7 +178,6 @@ public abstract class PostgreSqlSchemaGeneratorBase
     if (columns.length > 0) {
       buf.append("ALTER TABLE ");
       appendName(buf, columns[0].getTable());
-      buf.append(" DROP COLUMN ");
       boolean doComma = false;
       for (Column column : columns) {
         if (doComma) {
@@ -190,6 +189,7 @@ public abstract class PostgreSqlSchemaGeneratorBase
         if (isSqlFormatted()) {
           buf.append("\n  ");
         }
+        buf.append(" DROP COLUMN ");
         appendName(buf, column);
       }
     }
@@ -213,7 +213,6 @@ public abstract class PostgreSqlSchemaGeneratorBase
       }
       buf.append("ALTER TABLE ");
       appendName(buf, constraints[0].getTable());
-      buf.append(" ADD ");
       boolean doComma = false;
       for (Constraint constraint : constraints) {
         if (doComma) {
@@ -225,6 +224,7 @@ public abstract class PostgreSqlSchemaGeneratorBase
         if (isSqlFormatted()) {
           buf.append("\n  ");
         }
+        buf.append(" ADD ");
         appendDef(buf, constraint);
       }
     }
@@ -245,7 +245,6 @@ public abstract class PostgreSqlSchemaGeneratorBase
     if (constraints.length > 0) {
       buf.append("ALTER TABLE ");
       appendName(buf, constraints[0].getTable());
-      buf.append(" DROP CONSTRAINT ");
       boolean doComma = false;
       for (Constraint constraint : constraints) {
         if (doComma) {
@@ -257,6 +256,7 @@ public abstract class PostgreSqlSchemaGeneratorBase
         if (isSqlFormatted()) {
           buf.append("\n  ");
         }
+        buf.append(" DROP CONSTRAINT ");
         appendName(buf, constraint);
       }
     }
@@ -280,6 +280,9 @@ public abstract class PostgreSqlSchemaGeneratorBase
     }
     buf.append("INDEX ");
     appendName(buf, index.getName());
+//    if (index.getName().equalsIgnoreCase(index.getTable().getName())) {
+      buf.append("_IN");
+//    }
     buf.append(" ON ");
     appendName(buf, index.getTable());
     buf.append('(');

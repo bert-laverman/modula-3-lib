@@ -280,6 +280,8 @@ public class PostgreSQLDriver
     private static final Map<TypeClass, String>       tMap_   = new HashMap<TypeClass, String>();
   
     static {
+      tMap_.put(TypeClass.BOOLEAN, "boolean");
+
       tMap_.put(TypeClass.BIT, "bit");
       tMap_.put(TypeClass.VARBIT, "varbit");
   

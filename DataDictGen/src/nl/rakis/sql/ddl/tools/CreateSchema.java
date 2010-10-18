@@ -21,6 +21,7 @@ public class CreateSchema
       Schema schema = SqlTool.getSchemaLoader().load(SqlTool.getInputSchemaName());
 
       System.err.println("Generating schema");
+      schema.setName(SqlTool.getOutputSchemaName());
       SqlTool.getSchemaGenerator().create(schema);
     }
     catch (Exception e) {

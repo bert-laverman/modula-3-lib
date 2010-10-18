@@ -329,6 +329,7 @@ public abstract class SchemaGeneratorBase
       st.executeUpdate(ddl);
     }
     catch (SQLException e) {
+      System.err.println("Exception while executing DDL statement \""+ddl+"\"");
       e.printStackTrace();
     }
   }
