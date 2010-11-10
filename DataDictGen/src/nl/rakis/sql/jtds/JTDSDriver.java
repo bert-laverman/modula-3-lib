@@ -144,11 +144,11 @@ public class JTDSDriver
     private static final Map<String, TypeClass>       tMap_      = new HashMap<String, TypeClass>();
 
     static {
-      tMap_.put("bit", TypeClass.BIT);
+      tMap_.put("bit", TypeClass.BOOLEAN);
       tMap_.put("bigint", TypeClass.LONG); // 8 bytes
       tMap_.put("int", TypeClass.INT); // 4 bytes
       tMap_.put("smallint", TypeClass.SHORT); // 2 bytes
-      tMap_.put("tinyint", TypeClass.BYTE); // 1 byte
+      tMap_.put("tinyint", TypeClass.SHORT); // 1 byte, but alas
       tMap_.put("float", TypeClass.REAL); // 1-24: 4 bytes, 25-53: 8 bytes
       tMap_.put("real", TypeClass.REAL); // == float(24)
       tMap_.put("numeric", TypeClass.DECIMAL); // max precision 38
@@ -244,7 +244,6 @@ public class JTDSDriver
       map_.put(TypeClass.LONG, "bigint");
       map_.put(TypeClass.INT, "int");
       map_.put(TypeClass.SHORT, "smallint");
-      map_.put(TypeClass.BYTE, "tinyint");
       // tMap_.put(TypeClass.REAL, "float");
       map_.put(TypeClass.REAL, "real");
       // tMap_.put(TypeClass.NUMBER, "numeric");

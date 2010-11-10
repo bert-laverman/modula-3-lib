@@ -33,7 +33,7 @@ public abstract class ISOSchemaLoader
 {
   private static final String   SELECT_TABLES_QUERY_      = ""
                                                             + "SELECT * FROM information_schema.tables "
-                                                            + "WHERE table_schema = ?";
+                                                            + "WHERE (table_type='BASE TABLE') AND (table_schema = ?)";
   protected static final String SELECT_TABCOLS_QUERY_     = ""
                                                             + "SELECT column_name,column_default,is_nullable,data_type,character_maximum_length,character_octet_length,numeric_precision,numeric_precision_radix,numeric_scale,datetime_precision,is_updatable "
                                                             + "FROM information_schema.columns "

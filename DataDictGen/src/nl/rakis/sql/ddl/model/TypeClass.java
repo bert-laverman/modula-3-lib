@@ -11,7 +11,7 @@ public enum TypeClass
 {
   BIT(false, true, false, false),
   VARBIT(false, true, false, false),
-  BYTE,
+  /*BYTE, This doesn't exist in the standard!*/
   SHORT,
   INT,
   LONG,

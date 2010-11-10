@@ -26,131 +26,134 @@ public class SqlTool
   /**
    * 
    */
-  public static final String     INPUT_FILE                 = "input.file";
+  public static final String     INPUT_FILE             = "input.file";
 
   /**
    * 
    */
-  public static final String     INPUT_FILE_NAME            = "input.file.name";
+  public static final String     INPUT_FILE_NAME        = "input.file.name";
 
   /**
    * 
    */
-  public static final String     INPUT_DB                   = "input.db";
+  public static final String     INPUT_DB               = "input.db";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_DRIVER_CLASS      = "input.db.driverClass";
+  public static final String     INPUT_DB_DRIVER_CLASS  = "input.db.driverClass";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_SERVER            = "input.db.server";
+  public static final String     INPUT_DB_SERVER        = "input.db.server";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_PORT              = "input.db.port";
+  public static final String     INPUT_DB_PORT          = "input.db.port";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_NAME              = "input.db.name";
+  public static final String     INPUT_DB_NAME          = "input.db.name";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_USER              = "input.db.user";
+  public static final String     INPUT_DB_USER          = "input.db.user";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_PWD               = "input.db.pwd";
+  public static final String     INPUT_DB_PWD           = "input.db.pwd";
 
   /**
    * 
    */
-  public static final String     INPUT_DB_SCHEMA            = "input.db.schema";
+  public static final String     INPUT_DB_SCHEMA        = "input.db.schema";
 
   /**
    * 
    */
-  public static final String     OUTPUT_FILE                = "output.file";
+  public static final String     OUTPUT_FILE            = "output.file";
 
   /**
    * 
    */
-  public static final String OUTPUT_FILE_MODE = "output.file.mode";
+  public static final String     OUTPUT_FILE_MODE       = "output.file.mode";
 
   /**
    * 
    */
-  public static final String     OUTPUT_FILE_NAME           = "output.file.name";
+  public static final String     OUTPUT_FILE_NAME       = "output.file.name";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB                  = "output.db";
+  public static final String     OUTPUT_DB              = "output.db";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_DRIVER_CLASS     = "output.db.driverClass";
+  public static final String     OUTPUT_DB_DRIVER_CLASS = "output.db.driverClass";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_SERVER           = "output.db.server";
+  public static final String     OUTPUT_DB_SERVER       = "output.db.server";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_PORT             = "output.db.port";
+  public static final String     OUTPUT_DB_PORT         = "output.db.port";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_NAME             = "output.db.name";
+  public static final String     OUTPUT_DB_NAME         = "output.db.name";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_USER             = "output.db.user";
+  public static final String     OUTPUT_DB_USER         = "output.db.user";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_PWD              = "output.db.pwd";
+  public static final String     OUTPUT_DB_PWD          = "output.db.pwd";
 
   /**
    * 
    */
-  public static final String     OUTPUT_DB_SCHEMA           = "output.db.schema";
+  public static final String     OUTPUT_DB_SCHEMA       = "output.db.schema";
 
   /**
    * 
    */
-  public static final String     SQL_FORMATTED              = "sql.formatted";
+  public static final String     SQL_FORMATTED          = "sql.formatted";
 
-  public static final String     PROPFILE                   = "sql.properties";
+  public static final String     PROPFILE               = "sql.properties";
 
-  private static String          propFile_                  = PROPFILE;
-  private static String          inputFileName_             = null;
-  private static String          outputFileName_            = null;
+  private static String          propFile_              = PROPFILE;
+  private static String          inputFileName_         = null;
+  private static String          outputFileName_        = null;
 
-  private static Properties      props_                     = new Properties();
-  private static DbDriver        inputDriver_               = null;
-  private static String          inputSchemaName_           = null;
-  private static DbDriver        outputDriver_              = null;
-  private static String          outputSchemaName_          = null;
+  private static Properties      props_                 = new Properties();
+  private static DbDriver        inputDriver_           = null;
+  private static String          inputUrl_              = null;
+  private static Connection      inputConnection_       = null;
+  private static SchemaLoader    inputLoader_           = null;
+  private static String          inputSchemaName_       = null;
+  private static DbDriver        outputDriver_          = null;
+  private static String          outputUrl_             = null;
+  private static Connection      outputConnection_      = null;
+  private static SchemaLoader    outputLoader_          = null;
+  private static String          outputSchemaName_      = null;
 
-  private static SchemaLoader    schemaLoader_              = null;
-  private static Reader          schemaReader_              = null;
-  private static Connection      schemaLoaderConnection_    = null;
-  private static SchemaGenerator schemaGenerator_           = null;
-  private static PrintWriter     schemaWriter_              = null;
-  private static Connection      schemaGeneratorConnection_ = null;
+  private static Reader          schemaReader_          = null;
+  private static SchemaGenerator schemaGenerator_       = null;
+  private static PrintWriter     schemaWriter_          = null;
 
   public static void error(String msg) {
     System.err.println(msg);
@@ -253,14 +256,14 @@ public class SqlTool
       if (schemaReader_ != null) {
         schemaReader_.close();
       }
-      if (schemaLoaderConnection_ != null) {
-        schemaLoaderConnection_.close();
+      if (inputConnection_ != null) {
+        inputConnection_.close();
       }
       if (schemaWriter_ != null) {
         schemaWriter_.close();
       }
-      if (schemaGeneratorConnection_ != null) {
-        schemaGeneratorConnection_.close();
+      if (outputConnection_ != null) {
+        outputConnection_.close();
       }
     }
     catch (Exception e) {
@@ -323,6 +326,7 @@ public class SqlTool
       }
       catch (Exception e) {
         error("Failed to instantiate driver " + className);
+        e.printStackTrace();
         System.exit(1);
       }
     }
@@ -335,6 +339,30 @@ public class SqlTool
    */
   public static void setInputDriver(DbDriver driver) {
     inputDriver_ = driver;
+  }
+
+  public static String getInputUrl() {
+    if (inputUrl_ == null) {
+      inputUrl_ = haveProp(INPUT_DB_PORT) ? getInputDriver()
+          .buildUrl(getProp(INPUT_DB_SERVER), getIntProp(INPUT_DB_PORT),
+                    getProp(INPUT_DB_NAME)) : getInputDriver()
+          .buildUrl(getProp(INPUT_DB_SERVER), getProp(INPUT_DB_NAME));
+    }
+    return inputUrl_;
+  }
+
+  public static Connection getInputConnection()
+    throws SQLException
+  {
+    if (inputConnection_ == null) {
+      if (haveProp(INPUT_DB) && getBoolProp(INPUT_DB)) {
+        inputConnection_ = getInputDriver().getDb(getInputUrl(),
+                                                  getProp(INPUT_DB_USER),
+                                                  getProp(INPUT_DB_PWD));
+
+      }
+    }
+    return inputConnection_;
   }
 
   /**
@@ -364,11 +392,25 @@ public class SqlTool
    * @return the outputDriver
    */
   public static DbDriver getOutputDriver() {
+    if (outputDriver_ == null) {
+      final String className = props_.getProperty(OUTPUT_DB_DRIVER_CLASS);
+      try {
+        outputDriver_ = (DbDriver) Class.forName(className).newInstance();
+        outputDriver_.init();
+        outputDriver_.setProperties(props_);
+      }
+      catch (Exception e) {
+        error("Failed to instantiate driver " + className);
+        e.printStackTrace();
+        System.exit(1);
+      }
+    }
     return outputDriver_;
   }
 
   /**
-   * @param outputSchemaName the outputSchemaName to set
+   * @param outputSchemaName
+   *          the outputSchemaName to set
    */
   public static void setOutputSchemaName(String outputSchemaName) {
     outputSchemaName_ = outputSchemaName;
@@ -386,7 +428,31 @@ public class SqlTool
    *          the schemaLoader to set
    */
   public static void setSchemaLoader(SchemaLoader schemaLoader) {
-    schemaLoader_ = schemaLoader;
+    inputLoader_ = schemaLoader;
+  }
+
+  public static String getOutputUrl() {
+    if (outputUrl_ == null) {
+      outputUrl_ = haveProp(OUTPUT_DB_PORT) ? getOutputDriver()
+          .buildUrl(getProp(OUTPUT_DB_SERVER), getIntProp(OUTPUT_DB_PORT),
+                    getProp(OUTPUT_DB_NAME)) : getOutputDriver()
+          .buildUrl(getProp(OUTPUT_DB_SERVER), getProp(OUTPUT_DB_NAME));
+    }
+    return outputUrl_;
+  }
+
+  public static Connection getOutputConnection()
+    throws SQLException
+  {
+    if (outputConnection_ == null) {
+      if (haveProp(OUTPUT_DB) && getBoolProp(OUTPUT_DB)) {
+        outputConnection_ = getOutputDriver().getDb(getOutputUrl(),
+                                                    getProp(OUTPUT_DB_USER),
+                                                    getProp(OUTPUT_DB_PWD));
+
+      }
+    }
+    return outputConnection_;
   }
 
   /**
@@ -394,27 +460,40 @@ public class SqlTool
    * @throws FileNotFoundException
    * @throws SQLException
    */
-  public static SchemaLoader getSchemaLoader()
+  public static SchemaLoader getInputSchemaLoader()
     throws FileNotFoundException,
       SQLException
   {
-    if (schemaLoader_ == null) {
+    if (inputLoader_ == null) {
       if (haveProp(INPUT_FILE) && getBoolProp(INPUT_FILE)) {
         schemaReader_ = new BufferedReader(new FileReader(inputFileName_));
-        schemaLoader_ = getInputDriver().getSchemaXmlReader(schemaReader_);
+        inputLoader_ = getInputDriver().getSchemaXmlReader(schemaReader_);
       }
       else if (haveProp(INPUT_DB) && getBoolProp(INPUT_DB)) {
-        final String url = haveProp(INPUT_DB_PORT) ? getInputDriver()
-            .buildUrl(getProp(INPUT_DB_SERVER), getIntProp(INPUT_DB_PORT),
-                      getProp(INPUT_DB_NAME)) : getInputDriver()
-            .buildUrl(getProp(INPUT_DB_SERVER), getProp(INPUT_DB_NAME));
-        schemaLoaderConnection_ = getInputDriver()
-            .getDb(url, getProp(INPUT_DB_USER), getProp(INPUT_DB_PWD));
-        schemaLoader_ = getInputDriver()
-            .getSchemaLoader(schemaLoaderConnection_);
+        inputLoader_ = getInputDriver().getSchemaLoader(getInputConnection());
       }
     }
-    return schemaLoader_;
+    return inputLoader_;
+  }
+
+  /**
+   * @return the schemaLoader
+   * @throws FileNotFoundException
+   * @throws SQLException
+   */
+  public static SchemaLoader getOutputSchemaLoader()
+    throws FileNotFoundException,
+      SQLException
+  {
+    if (outputLoader_ == null) {
+      if (haveProp(OUTPUT_FILE) && getBoolProp(OUTPUT_FILE)) {
+        throw new SQLException("Cannot set a SchemaLoader on an output file");
+      }
+      else if (haveProp(OUTPUT_DB) && getBoolProp(OUTPUT_DB)) {
+        outputLoader_ = getOutputDriver().getSchemaLoader(getOutputConnection());
+      }
+    }
+    return outputLoader_;
   }
 
   /**
@@ -440,34 +519,39 @@ public class SqlTool
           final String mode = getProp(OUTPUT_FILE_MODE);
 
           if (mode.equalsIgnoreCase("xml")) {
-            schemaGenerator_ = getInputDriver().getSchemaXmlWriter(getWriter());
+            schemaGenerator_ = getOutputDriver()
+                .getSchemaXmlWriter(getWriter());
           }
         }
         if (schemaGenerator_ == null) {
-          schemaGenerator_ = getInputDriver().getSchemaWriter(getWriter());
+          schemaGenerator_ = getOutputDriver().getSchemaWriter(getWriter());
         }
       }
       else if (haveProp(OUTPUT_DB) && getBoolProp(OUTPUT_DB)) {
-        final String url = haveProp(OUTPUT_DB_PORT) ? getInputDriver()
-            .buildUrl(getProp(OUTPUT_DB_SERVER), getIntProp(OUTPUT_DB_PORT),
-                      getProp(OUTPUT_DB_NAME)) : getInputDriver()
-            .buildUrl(getProp(OUTPUT_DB_SERVER), getProp(OUTPUT_DB_NAME));
-        schemaGeneratorConnection_ = getInputDriver()
-            .getDb(url, getProp(OUTPUT_DB_USER), getProp(OUTPUT_DB_PWD));
-        schemaGenerator_ = getInputDriver()
-            .getSchemaGenerator(schemaGeneratorConnection_);
+        try {
+          schemaGenerator_ = getOutputDriver()
+              .getSchemaGenerator(getOutputConnection());
+        }
+        catch (SQLException e) {
+          System.err
+              .println("Exception trying to connect to " + getOutputUrl());
+          throw e;
+        }
       }
     }
     return schemaGenerator_;
   }
 
-  public static PrintWriter getWriter() throws FileNotFoundException {
+  public static PrintWriter getWriter()
+    throws FileNotFoundException
+  {
     if (schemaWriter_ == null) {
       if (outputFileName_ != null) {
         schemaWriter_ = new PrintWriter(outputFileName_);
       }
       else {
-        throw new FileNotFoundException("getWriter(): Output filename not specified.");
+        throw new FileNotFoundException(
+                                        "getWriter(): Output filename not specified.");
       }
     }
     return schemaWriter_;

@@ -188,7 +188,7 @@ public class GenDataDict
 
     try {
       System.err.println("Loading schema");
-      Schema schema = SqlTool.getSchemaLoader().load(SqlTool
+      Schema schema = SqlTool.getInputSchemaLoader().load(SqlTool
                                                          .getInputSchemaName());
 
       out = SqlTool.getWriter();

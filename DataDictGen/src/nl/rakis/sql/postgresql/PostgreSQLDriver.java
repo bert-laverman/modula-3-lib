@@ -100,6 +100,7 @@ public class PostgreSQLDriver
    */
   @Override
   public SchemaGenerator getSchemaGenerator(Connection db) {
+    System.err.println("New SchemaGenerator");
     return new PostgreSqlSchemaGenerator(this, db);
   }
 
@@ -146,7 +147,6 @@ public class PostgreSQLDriver
         tMap_.put("bigint", TypeClass.LONG); // 8 bytes
         tMap_.put("int", TypeClass.INT); // 4 bytes
         tMap_.put("integer", TypeClass.INT); // 4 bytes
-        tMap_.put("int1", TypeClass.BYTE); // 1 bytes
         tMap_.put("int2", TypeClass.SHORT); // 2 bytes
         tMap_.put("int4", TypeClass.INT); // 4 bytes
         tMap_.put("int8", TypeClass.LONG); // 8 bytes
@@ -156,7 +156,7 @@ public class PostgreSQLDriver
         tMap_.put("float4", TypeClass.FLOAT); // 1-24: 4 bytes, 25-53: 8 bytes
         tMap_.put("double precision", TypeClass.DOUBLE); // 1-24: 4 bytes, 25-53: 8 bytes
         tMap_.put("float8", TypeClass.DOUBLE); // 1-24: 4 bytes, 25-53: 8 bytes
-  //      tMap_.put("real", TypeClass.REAL); // == float(24)
+        tMap_.put("real", TypeClass.REAL); // == float(24)
         tMap_.put("numeric", TypeClass.DECIMAL); // max precision 38
   //      tMap_.put("dec", TypeClass.DECIMAL); // max precision 38
         tMap_.put("decimal", TypeClass.DECIMAL); // max precision 38
@@ -188,6 +188,7 @@ public class PostgreSQLDriver
                                                          // 2079-06-06, 00:00:00
                                                          // to 23:59:59
         tMap_.put("timestamp with time zone", TypeClass.TIMESTAMP); // 1753-01-01 to 9999-12-31,
+        tMap_.put("timestamp without time zone", TypeClass.TIMESTAMP); // 1753-01-01 to 9999-12-31,
         // 00:00:00 to 23:59:59.997
         tMap_.put("timestamp", TypeClass.TIMESTAMP); // 1753-01-01 to 9999-12-31,
         // 00:00:00 to 23:59:59.997
@@ -288,7 +289,6 @@ public class PostgreSQLDriver
       tMap_.put(TypeClass.LONG, "bigint");
       tMap_.put(TypeClass.INT, "int");
       tMap_.put(TypeClass.SHORT, "smallint");
-      tMap_.put(TypeClass.BYTE, "tinyint");
       // tMap_.put(TypeClass.REAL, "float");
       tMap_.put(TypeClass.REAL, "real");
       // tMap_.put(TypeClass.DECIMAL, "dec");
