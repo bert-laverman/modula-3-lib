@@ -3,6 +3,7 @@
  */
 package nl.rakis.sql.ddl.tools;
 
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -86,6 +87,7 @@ public class CopySchemaData
     public String from;
     public String to;
     public boolean convertMoney = false;
+    public boolean copyClob = false;
   }
 
   private static void copyTableData(Table table, Schema targetSchema,
@@ -142,11 +144,18 @@ public class CopySchemaData
           }
         }
 
+        final TypeClass clazz = column.getType().getClazz();
+
         if (targetColumn != null) {
           tuple.to = targetColumn.getName();
-          if ((column.getType().getClazz() == TypeClass.MONEY) || (targetColumn.getType().getClazz() == TypeClass.MONEY)) {
+          if ((clazz == TypeClass.MONEY) || (targetColumn.getType().getClazz() == TypeClass.MONEY)) {
             tuple.convertMoney = true;
           }
+        }
+
+        if ((clazz == TypeClass.CLOB) || (clazz == TypeClass.NCLOB) ||
+            (((clazz == TypeClass.VARCHAR) || (clazz == TypeClass.NVARCHAR)) && (column.getType().getLength() == -1))) {
+          tuple.copyClob = true;
         }
         cols.add(tuple);
       }
@@ -206,6 +215,10 @@ public class CopySchemaData
               Double value = rs.getDouble(thisCol.from);
               String newValue = (value == null) ? null : nf.format(value);
               outputSt.setString(i+1, newValue);
+            }
+            else if (thisCol.copyClob) {
+              Clob value =  rs.getClob(thisCol.from);
+              outputSt.setClob(i+1, value);
             }
             else {
               outputSt.setObject(i+1, rs.getObject(thisCol.from));
