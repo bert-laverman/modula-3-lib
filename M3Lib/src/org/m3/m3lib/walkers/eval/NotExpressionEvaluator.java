@@ -1,0 +1,51 @@
+/**
+ * Copyright (c) 2008 B. Laverman. All rights reserved. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: bertl
+ */
+
+// $Id$
+
+
+package org.m3.m3lib.walkers.eval;
+
+import org.m3.m3lib.ast.Context;
+import org.m3.m3lib.ast.IncompatibleTypeException;
+import org.m3.m3lib.ast.expr.NotExpression;
+import org.m3.m3lib.ast.value.BooleanValue;
+import org.m3.m3lib.ast.value.Value;
+import org.m3.m3lib.reflect.visitor.Visitor;
+
+/**
+ * 
+ * @author LavermB
+ *
+ */
+public class NotExpressionEvaluator
+    extends ExpressionEvaluator
+    implements Visitor
+{
+
+  /**
+   * 
+   */
+  public NotExpressionEvaluator()
+  {
+    super();
+  }
+
+  public Value getReturnState(NotExpression e, Context c)
+      throws IncompatibleTypeException
+  {
+    return new BooleanValue(!evalBooleanExpression(e.getOpnd(), c));
+  }
+
+}
+
+
+/*
+ * $Log$
+ */
