@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <ui:composition>
+    <div class="sidebarSection">
+      <div class="sidebarSectionHeader">Environments</div>
+      <div class="sidebarSectionBody">
+        Some body, eh?
+      </div>
+    </div>
+
+    <div class="sidebarSection">
+      <div class="sidebarSectionHeader" id="sbSrvHeader">Servers</div>
+      <div class="sidebarSectionBody" id="sbSrvBody">
+        Some body, eh?
+      </div>
+    </div>
+
+    <div class="sidebarSection">
+      <div class="sidebarSectionHeader" id="sbAppHeader">Applications</div>
+      <div class="sidebarSectionBody" id="sbAppBody">
+        Some body, eh?
+      </div>
+    </div>
+
+    <div class="sidebarSection">
+      <div class="sidebarSectionHeader" id="sbOrgHeader">Organizations</div>
+      <div class="sidebarSectionBody" id="sbOrgBody">
+        Some body, eh?
+      </div>
+    </div>
+
+<script>
+  $(function() {
+	  $("div.sidebarSectionHeader")
+	    .click(function() {
+	      if ($(this).next().is(':hidden')) {
+		    $(this).next().show();
+		  }
+	      else {
+		    $(this).next().hide();
+		  }
+          return false;
+	    })
+	    .css('cursor', 'pointer')
+	    .click();
+  });
+
+</script>
+
+  </ui:composition>
+
+</html>
