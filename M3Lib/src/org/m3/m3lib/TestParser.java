@@ -22,16 +22,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.m3.m3lib.ast.Context;
 import org.m3.m3lib.ast.M3CompilationUnit;
 import org.m3.m3lib.ast.SimpleContext;
-import org.m3.m3lib.ast.stat.Statement;
+import org.m3.m3lib.ast.expr.Expression;
+import org.m3.m3lib.ast.expr.ValueExpression;
+import org.m3.m3lib.ast.value.ObjectValue;
+import org.m3.m3lib.ast.value.Value;
 import org.m3.m3lib.parser.DefaultMessageCollector;
 import org.m3.m3lib.parser.M3Parser;
 import org.m3.m3lib.parser.Message;
 import org.m3.m3lib.reflect.visitor.Walker;
 import org.m3.m3lib.scanner.M3Scanner;
 import org.m3.m3lib.scanner.SourceLocation;
+import org.m3.m3lib.walkers.eval.ExpressionEvaluator;
 import org.m3.m3lib.walkers.print.ASTPrinter;
 
 /**
@@ -113,15 +118,15 @@ public class TestParser
     m.put("field1", new Long(123));
     m.put("field2", new Boolean(false));
     m.put("field3", new Double(3.14159265));
-    //    sc.bind("map", m);
+    sc.bind("map", ObjectValue.fromJavaObject(m));
     List<String> l = new ArrayList<String>();
     l.add("aap");
     l.add("noot");
     l.add("mies");
-    //    sc.bind("array", l);
+    sc.bind("array", ObjectValue.fromJavaObject(l));
 
-    //    sc.bind("person", new MyBean());
-    sc.bind("int1", new Integer(1));
+    sc.bind("person", ObjectValue.fromJavaObject(new MyBean()));
+    sc.bind("int1", ObjectValue.fromJavaObject(1));
     //    sc.bind("gw", new Gateway());
 
     return sc;
@@ -130,7 +135,9 @@ public class TestParser
   private static void interactiveMain(Context ctx)
   {
     StringBuffer line = new StringBuffer();
-
+    PropertyConfigurator.configure("log4j.properties");
+    PrintWriter stderr = new PrintWriter(System.err);
+    ASTPrinter ptr = new ASTPrinter(stderr);
     System.err.print("=> ");
     while (true) {
       try {
@@ -144,19 +151,23 @@ public class TestParser
           if (line.toString().equals("quit")) {
             break;
           }
-          PrintWriter stderr = new PrintWriter(System.err);
-          PrintWriter stdout = new PrintWriter(System.out);
           M3Scanner s = new M3Scanner(new StringReader(line.toString()));
           s.next();
           M3Parser prs = new M3Parser(s);
-          Statement st;
-          while ((st = prs.parseStatement()) != null) {
-            if (st != null) {
-              Walker.walk(st, new ASTPrinter(stderr));
+          Expression exp;
+          while ((exp = prs.parseExpression()) != null) {
+            if (exp != null) {
+              Value val = ExpressionEvaluator.evalExpression(exp, ctx);
+              try {
+                Walker.walkE(new ValueExpression(val), ptr.getExpressionPrinter());
+              }
+              catch (Throwable e) {
+                e.printStackTrace();
+              }
+              stderr.println();
             }
           }
 
-          stdout.flush();
           stderr.flush();
 
           line.setLength(0);

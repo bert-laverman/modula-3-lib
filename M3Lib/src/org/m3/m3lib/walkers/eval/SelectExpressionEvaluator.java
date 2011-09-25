@@ -13,9 +13,9 @@
 package org.m3.m3lib.walkers.eval;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.m3.m3lib.ast.Binding;
 import org.m3.m3lib.ast.Context;
 import org.m3.m3lib.ast.M3Runtime;
@@ -64,7 +64,14 @@ public class SelectExpressionEvaluator
 
     if (lhs.getType() instanceof JavaClassType) {
       Object o = lhs.toObject();
-      if (o instanceof Class) {
+      if (o instanceof Map<?,?>) {
+        Map<?,?> map = (Map<?, ?>) o;
+        if (map.containsKey(id)) {
+          return ObjectValue.fromJavaObject(map.get(id));
+        }
+        return ObjectValue.UNDEFINED;
+      }
+      else if (o instanceof Class) {
         Class<?> clazz = (Class<?>)o;
 
         // Going static?

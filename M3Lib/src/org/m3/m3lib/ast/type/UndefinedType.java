@@ -101,6 +101,11 @@ public class UndefinedType
     return getName();
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof UndefinedType;
+  }
+
   public static String getName()
   {
     return "UNDEFINED";

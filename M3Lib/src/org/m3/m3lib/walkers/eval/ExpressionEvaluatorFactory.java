@@ -34,7 +34,7 @@ public class ExpressionEvaluatorFactory
   {
     super(new ExpressionEvaluator(),
 //          ExpressionEvaluatorFactory.class.getPackage().getName(),
-          "com.syllogic.m3.ast.expr.eval",
+          "org.m3.m3lib.walkers.eval",
           null,
           "Evaluator");
   }

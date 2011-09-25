@@ -28,6 +28,7 @@ import org.m3.m3lib.ast.type.CharType;
 import org.m3.m3lib.ast.type.TextType;
 import org.m3.m3lib.ast.value.CharValue;
 import org.m3.m3lib.ast.value.TextValue;
+import org.m3.m3lib.ast.value.Value;
 import org.m3.m3lib.reflect.visitor.Visitor;
 import org.m3.m3lib.reflect.visitor.Walker;
 
@@ -147,14 +148,16 @@ public class ExpressionPrinter
 
   public void startVisit(ValueExpression e)
   {
-    if (e.getValue().getType() instanceof TextType) {
-      getBase().print(TextValue.quote(e.getValue().toString()));
+    Value val = e.getValue().getValue();
+
+    if (val.getType() instanceof TextType) {
+      getBase().print(TextValue.quote(val.toString()));
     }
-    else if (e.getValue().getType() instanceof CharType) {
-      getBase().print(CharValue.quote(e.getValue().toString().charAt(0)));
+    else if (val.getType() instanceof CharType) {
+      getBase().print(CharValue.quote(val.toString().charAt(0)));
     }
     else {
-      getBase().print(e.getValue().toString());
+      getBase().print(val.toString());
     }
   }
 

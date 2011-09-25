@@ -34,7 +34,7 @@ public class StatementRunnerFactory
   {
     super(new StatementRunner(),
 //          StatementRunnerFactory.class.getPackage().getName(),
-          "com.syllogic.m3.ast.stat.run",
+          "org.m3.m3lib.walkers.run",
           null,
           "Runner");
   }
